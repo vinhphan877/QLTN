@@ -3,21 +3,23 @@
         <input name="fields[title]" type="Form.Text" value="{title ?? ''}"
                placeholder="{'Tên tòa nhà'}" class="form-control">
     </Layout.label>
+    <Layout.label label="Địa chỉ" required=1>
+        <input name="fields[address]" type="Form.Text" value="{address ?? ''}"
+               class="form-control">
+    </Layout.label>
     <Layout.label label="Tổng số tầng" required=1>
         <input name="fields[totalFloor]" type="Form.Text" value="{totalFloor ?? ''}"
                class="form-control">
     </Layout.label>
-    <Layout.label label="Loại tầng" required=1>
-        <input name="fields[floorKind]" type="Form.Text" value="{floorKind ?? '')}"
-               class="form-control">
-    </Layout.label>
     <Layout.label label="Tổng số phòng" required=1>
-        <input name="fields[totalRoom]" type="Form.Text" value="{totalRoom ?? '')}"
+        <input name="fields[totalRoom]" type="Form.Text" value="{totalRoom ?? ''}"
                class="form-control">
     </Layout.label>
-    <Layout.label label="Thời gian bắt đầu đi vào hoạt động" required=1>
-        <input name="fields[since]" type="Form.DateTimePicker" value="{since ?? '')}"
-               class="form-control">
+    <Layout.label label="Trạng thái" required=1>
+        <input class="form-control" type="Form.Select" name="fields[status]"
+               value="{status ?? ''}"
+               items="{\Core\lib\BasicStatus::selectList()}"
+               description="-- {'Chọn trạng thái'} --">
     </Layout.label>
 </CMS.edit>
 <script type="text/javascript">
@@ -27,19 +29,30 @@
                 required: true,
                 maxlength: 255
             },
-            'fields[totalFloor]': {
+            'fields[address]': {
                 required: true
             },
-            'fields[floorKind]': {
-                required: true
+            'fields[totalFloor]': {
+                required: true,
+                digits: true,
+                range: [10, 80]
             },
             'fields[totalRoom]': {
-                required: true
-            },
-            'fields[since]': {
                 required: true,
-                dateVN: true
+                digits: true,
+                min: 1
+            },
+            'fields[status]': {
+                required: true
             }
         },
+        messages: {
+            'fields[totalFloor]': {
+                range: 'Số tầng phải nằm trong khoảng từ 10 đến 80'
+            },
+            'fields[totalRoom]': {
+                min: 'Số phòng phải lớn hơn 0'
+            }
+        }
     });
 </script>
