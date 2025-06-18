@@ -10,5 +10,5 @@
     <td>{notag(items.address ?? '')}</td>
     <td>{notag(items.totalFloor ?? '')}</td>
     <td>{notag(items.totalRoom ?? '')}</td>
-    <td>{!empty(items.status) ?? ''}</td>
+    <td>{notag(items.statusTitle) ?? ''}</td>
 </CMS.Admin.table>

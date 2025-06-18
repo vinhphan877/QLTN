@@ -8,7 +8,7 @@
 
 namespace Samples\Newbie\VinhPT2\Admin\lib;
 
-use CMS\Article\lib\Status;
+use Core\lib\BasicStatus;
 use Data\lib\CRUD;
 
 class Building extends CRUD {
@@ -29,14 +29,21 @@ class Building extends CRUD {
     }
 
     protected function checkItem(array &$item): bool {
-        $item['status'] = Status::getTitle($item['status'] ?? '');
+        $item['statusTitle'] = BasicStatus::getTitle($item['status'] ?? '');
         return parent::checkItem($item);
     }
 
     protected function prepareList(array &$return): void {
         if (!empty($return['items'])) {
-            Status::getTitle($return['items'], 'status');
+            BasicStatus::addTitle($return['items'], 'status');
         }
         parent::prepareList($return);
     }
+
+    protected static function addFields(array &$items): void {
+        foreach ($items as &$item) {
+            $item['statusTitle'] = BasicStatus::getTitle($item['status'] ?? '');
+        }
+    }
+
 }

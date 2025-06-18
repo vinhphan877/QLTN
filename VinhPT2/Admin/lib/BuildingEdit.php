@@ -17,6 +17,13 @@ use CMS\Article\lib\Status;
 class BuildingEdit {
     public static string $type = 'Newbie.VinhptBuilding';
 
+    /**
+     * Kiểm tra các trường bắt buộc trong form
+     * @author vinhpt
+     * @param array $fields Mảng chứa thông tin dữ liệu cần kiểm tra
+     * @param array $return Mảng tham chiếu để lưu thông báo lỗi, nếu có
+     * @return bool Trả về true nếu tất cả trường bắt buộc hợp lệ, ngược lại trả về false
+     */
     public static function checkRequired(array $fields, array &$return): bool {
         $requiredFields = [
             'title',
@@ -28,7 +35,7 @@ class BuildingEdit {
         $valid = true;
 
         foreach ($requiredFields as $field) {
-            if (empty($fields[$field])) {
+            if (!isset($fields[$field]) || $fields[$field] === '') {
                 $return['errors'][$field] = "Trường '{$field}' không được để trống.";
                 $valid = false;
             }
@@ -42,6 +49,13 @@ class BuildingEdit {
         return $valid;
     }
 
+    /**
+     * Kiểm tra tính hợp lệ của số tầng tòa nhà
+     * @author vinhpt
+     * @param array $fields Mảng chứa thông tin dữ liệu, bao gồm số tầng
+     * @param array $return Mảng tham chiếu để lưu thông báo lỗi, nếu có
+     * @return bool Trả về true nếu số tầng hợp lệ, ngược lại trả về false
+     */
     public static function validateBuilding(array $fields, array &$return): bool {
         if (!empty($fields['totalFloor'])
             && ($fields['totalFloor'] < 10 || $fields['totalFloor'] > 80)) {
@@ -51,22 +65,28 @@ class BuildingEdit {
         return true;
     }
 
-    public static function checkExistsBuilding(array $fields, array $oldItem, array &$return): bool {
-        $filters = [
-            'title' => $fields['title'],
-            'address' => $fields['address'],
-            'totalFloor' => $fields['totalFloor'],
-            'totalRoom' => $fields['totalRoom']
-        ];
-
-        if (!empty($oldItem)) {
-            $filters['_id'] = ['$ne' => Data::objectId($oldItem['id'])];
-        }
-
-        $existing = Data(self::$type)->select($filters);
-        if ($existing) {
-            $return['message'] = 'Tòa nhà này đã tồn tại';
-            return false;
+    /**
+     * Kiểm tra sự tồn tại của tòa nhà trong hệ thống
+     * @author vinhpt
+     * @param array $fields Mảng chứa thông tin tòa nhà cần kiểm tra
+     * @param array $return Mảng tham chiếu để lưu thông báo lỗi, nếu có
+     * @param array $oldItem Mảng chứa thông tin tòa nhà cũ (nếu có)
+     * @return bool Trả về true nếu tòa nhà chưa tồn tại, ngược lại trả về false
+     */
+    public static function checkExistsBuilding(array $fields, array &$return, array $oldItem): bool {
+        if (!empty($fields['title'])) {
+            $filters = [
+                'site' => portal()->id,
+                'title' => $fields['title'],
+                'address' => $fields['address']
+            ];
+            if (!empty($oldItem)) {
+                $filters['_id'] = ['$ne' => Data::objectId($oldItem['id'])];
+            }
+            if (Data(static::$type)->select($filters)) {
+                $return['message'] = $return['errors']['fields[title]'] = 'Tòa nhà này đã tồn tại tại địa chỉ này';
+                return false;
+            }
         }
         return true;
     }
