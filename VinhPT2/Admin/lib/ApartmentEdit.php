@@ -85,4 +85,36 @@ class ApartmentEdit {
         return true;
     }
 
+    /**
+     * Kiểm tra trạng thái của tòa nhà được chọn và số lượng căn hộ
+     * @author vinhpt
+     * @param array $fields Mảng chứa thông tin căn hộ cần kiểm tra
+     * @param array $return Mảng tham chiếu để lưu thông báo lỗi
+     * @return bool Trả về true nếu tòa nhà hợp lệ và chưa đạt giới hạn căn hộ, ngược lại trả về false
+     */
+    public static function checkBuilding(array $fields, array &$return): bool {
+        if (!empty($fields['buildingId'])) {
+            $building = Data('Newbie.VinhptBuilding')->select([
+                'site' => portal()->id,
+                '_id' => Data::objectId($fields['buildingId'])
+            ]);
+
+            if (!empty($building) && $building['status'] == 0) {
+                $return['message'] = 'Tòa nhà không còn hoạt động';
+                return false;
+            }
+
+            $apartmentCount = Data(static::$type)->count([
+                'site' => portal()->id,
+                'buildingId' => $fields['buildingId']
+            ]);
+
+            if (!empty($building['totalRoom']) && $apartmentCount >= $building['totalRoom']) {
+                $return['message'] = 'Số lượng căn hộ đã đạt giới hạn của tòa nhà';
+                return false;
+            }
+        }
+        return true;
+    }
+
 }

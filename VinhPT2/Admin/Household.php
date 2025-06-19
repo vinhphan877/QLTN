@@ -14,6 +14,7 @@ class Household extends CRUD {
         'selectList' => 'owner',
         'delete' => 'owner',
         'edit' => 'owner',
+        'detail' => 'owner',
     ];
 
 }

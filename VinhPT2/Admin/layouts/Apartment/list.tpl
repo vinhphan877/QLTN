@@ -1,4 +1,7 @@
 <CMS.Admin.list sortTime="1" modalClass="modal-md" typeTitle="{'Quản lý căn hộ'}">
+    <region name="menuTab">
+        <Samples.Newbie.VinhPT2.Admin.tab></Samples.Newbie.VinhPT2.Admin.tab>
+    </region>
     <region name="filter">
         <div>
             <input type="Form.Text" name="filters[suggestTitle]" class="form-control"

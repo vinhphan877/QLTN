@@ -21,14 +21,6 @@ class Apartment extends CRUD {
         'orderBy' => 'createdTime DESC'
     ];
 
-    protected function checkDelete(array &$item, array &$return): bool {
-        if (!empty($item['status']) && $item['status'] == 1) {
-            $return['message'] = 'Căn hộ đã có người thuê, không được xóa';
-            return false;
-        }
-        return parent::checkDelete($item, $return);
-    }
-
     protected function checkItem(array &$item): bool {
         $item['statusTitle'] = ApartmentStatus::getTitle($item['status'] ?? '');
         return parent::checkItem($item);
@@ -55,6 +47,7 @@ class Apartment extends CRUD {
         return ApartmentEdit::checkRequired($fields, $return)
             && ApartmentEdit::checkFloor($fields, $oldItem)
             && ApartmentEdit::checkExists($fields, $return, $oldItem)
+            && ApartmentEdit::checkBuilding($fields, $return)
             && parent::prepareEdit($fields, $oldItem, $return);
     }
 

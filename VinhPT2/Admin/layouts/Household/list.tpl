@@ -1,11 +1,11 @@
-<CMS.Admin.list sortTime="1" modalClass="modal-md" typeTitle="{'Quản lý tòa nhà'}">
+<CMS.Admin.list sortTime="1" modalClass="modal-md" typeTitle="{'Quản lý hộ gia đình'}">
     <region name="menuTab">
         <Samples.Newbie.VinhPT2.Admin.tab></Samples.Newbie.VinhPT2.Admin.tab>
     </region>
     <region name="filter">
         <div>
             <input type="Form.Text" name="filters[suggestTitle]" class="form-control"
-                   placeholder="{'Tìm kiếm theo tên tòa'}"
+                   placeholder="{'Tìm kiếm theo hộ gia đình'}"
                    value="{(filters['suggestTitle']??'')}"
             >
         </div>
