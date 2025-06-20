@@ -11,7 +11,6 @@ namespace Samples\Newbie\VinhPT2\Admin\lib;
 use Core\Enum\lib\Gender;
 use Data;
 use Data\lib\CRUD;
-use Samples\Newbie\VinhPT2\Enum\lib\ApartmentStatus;
 
 class Household extends CRUD {
     public static string $type = 'Newbie.VinhptHousehold';
@@ -19,7 +18,6 @@ class Household extends CRUD {
     public static array $options = [
         'itemsPerPage' => 20,
         'pageNo' => 1,
-        'fields' => '*',
         'orderBy' => 'createdTime DESC'
     ];
 
@@ -31,6 +29,7 @@ class Household extends CRUD {
     protected function prepareEdit(array &$fields, array &$oldItem, array &$return): bool {
         return HouseholdEdit::checkRequired($fields, $return)
             && HouseholdEdit::checkValidApartment($fields, $return)
+            && HouseholdEdit::checkTime($fields, $return)
             && parent::prepareEdit($fields, $oldItem, $return);
     }
 
@@ -52,14 +51,11 @@ class Household extends CRUD {
 
     public static function addFields(array &$items): void {
         foreach ($items as &$item) {
-            $item['gender'] = ApartmentStatus::getTitle($item['gender'] ?? '');
+            $item['gender'] = Gender::getTitle($item['gender'] ?? '');
         }
         Data::getMoreFields('Newbie.VinhptApartment', $items, [
             'apartmentId' => ['title' => 'apartmentTitle'],
         ]);
-
-        Data::getMoreFields('Newbie.VinhptBuilding', $items, [
-            'buildingId' => ['title' => 'buildingTitle'],
-        ]);
     }
+
 }
