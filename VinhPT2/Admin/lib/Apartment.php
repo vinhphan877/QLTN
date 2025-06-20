@@ -45,7 +45,7 @@ class Apartment extends CRUD {
 
     protected function prepareEdit(array &$fields, array &$oldItem, array &$return): bool {
         return ApartmentEdit::checkRequired($fields, $return)
-            && ApartmentEdit::checkFloor($fields, $oldItem)
+            && ApartmentEdit::checkFloor($fields, $return)  // Sửa lại tham số
             && ApartmentEdit::checkExists($fields, $return, $oldItem)
             && ApartmentEdit::checkBuilding($fields, $return)
             && parent::prepareEdit($fields, $oldItem, $return);
