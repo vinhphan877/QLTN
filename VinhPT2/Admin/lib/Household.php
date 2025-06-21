@@ -26,23 +26,44 @@ class Household extends CRUD {
             && parent::checkDelete($item, $return);
     }
 
+    protected function deleteSuccess(array &$return, array &$item): void {
+        if (!empty($item['apartmentId'])) {
+            Data('Newbie.VinhptApartment')->update(['status' => 1], $item['apartmentId']);
+        }
+
+        if (!empty($item['feeId'])) {
+            Data('Newbie.VinhptFee')->update(['status' => 1], $item['feeId']);
+        }
+
+        if (!empty($item['residentCommentId'])) {
+            Data('Newbie.VinhptResidentComment')->update(['status' => 1], $item['residentCommentId']);
+        }
+        parent::deleteSuccess($return, $item);
+    }
+
     protected function prepareEdit(array &$fields, array &$oldItem, array &$return): bool {
         return HouseholdEdit::checkRequired($fields, $return)
             && HouseholdEdit::checkValidApartment($fields, $return)
             && HouseholdEdit::checkTime($fields, $return)
+            && HouseholdEdit::validateMembers($fields['members'] ?? [], $return)
             && parent::prepareEdit($fields, $oldItem, $return);
     }
 
     protected function prepareList(array &$return): void {
         if (!empty($return['items'])) {
             static::addFields($return['items']);
-        }
-        if (!empty($return['items'])) {
             Gender::addTitle($return['items'], 'gender');
+            foreach ($return['items'] as &$item) {
+                if (!empty($item['members'])) {
+                    foreach ($item['members'] as &$member) {
+                        $member['genderTitle'] = Gender::getTitle($member['gender'] ?? '');
+                    }
+                }
+            }
         }
         parent::prepareList($return);
-
     }
+
 
     protected function checkItem(array &$item): bool {
         $item['genderTitle'] = Gender::getTitle($item['gender'] ?? '');
@@ -58,4 +79,5 @@ class Household extends CRUD {
         ]);
     }
 
+    // 9
 }

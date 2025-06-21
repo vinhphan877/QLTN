@@ -117,4 +117,33 @@ class ApartmentEdit {
         return true;
     }
 
+    /**
+     * Kiểm tra số lượng căn hộ so với tổng số phòng của tòa nhà
+     * @author vinhpt
+     * @param array $fields Mảng chứa thông tin căn hộ cần kiểm tra
+     * @param array $return Mảng tham chiếu để lưu thông báo lỗi
+     * @return bool Trả về true nếu số lượng căn hộ hợp lệ, ngược lại trả về false
+     */
+    public static function checkRoom(array $fields, array &$return): bool {
+        if (!empty($fields['buildingId'])) {
+            $building = Data('Newbie.VinhptBuilding')->select([
+                'site' => portal()->id,
+                '_id' => Data::objectId($fields['buildingId'])
+            ]);
+
+            if (!empty($building['totalRoom'])) {
+                $apartmentCount = Data(static::$type)->count([
+                    'site' => portal()->id,
+                    'buildingId' => $fields['buildingId']
+                ]);
+
+                if ($apartmentCount >= $building['totalRoom']) {
+                    $return['message'] = 'Số lượng căn hộ đã vượt quá số phòng của tòa nhà';
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
 }

@@ -7,8 +7,8 @@
         <input name="fields[price]" type="Form.Number" value="{price ?? ''}"
                class="form-control">
     </Layout.label>
-    <Layout.label label="Thời gian áp dụng" required=1>
-        <input name="fields[rangeTime]" type="Form.DateRangePicker" value="{(rangeTime??'')}"
+    <Layout.label label="Hạn nộp" required=1>
+        <input name="fields[deadline]" type="Form.DateRangePicker" value="{(deadline??'')}"
                class="form-control" description="Chọn khoảng thời gian">
     </Layout.label>
 </CMS.edit>
@@ -24,7 +24,7 @@
                 number: true,
                 min: 0
             },
-            'fields[rangeTime]': {
+            'fields[deadline]': {
                 required: true,
                 dateRangeVN: true
             }

@@ -16,7 +16,7 @@ class HouseholdEdit {
      * @param array &$return Mảng tham chiếu để lưu thông báo lỗi
      * @return bool Trả về true nếu tất cả trường bắt buộc đã được điền, ngược lại trả về false
      */
-    public static function checkRequired(array &$fields, array &$return): bool {
+    public static function checkRequired(array &$fields, array &$return): array {
         $requiredFields = [
             'apartmentId',
             'title',
@@ -26,16 +26,15 @@ class HouseholdEdit {
             'startTime',
             'endTime'
         ];
-        $valid = true;
+        $errors = [];
 
         foreach ($requiredFields as $field) {
-            if (!isset($fields[$field])) {
-                $return['errors'][$field] = "Trường '{$field}' không được để trống.";
-                $valid = false;
+            if (!isset($fields[$field]) || empty($fields[$field])) {
+                $errors[$field] = "Trường '{$field}' không được để trống.";
             }
         }
 
-        return $valid;
+        return $errors;
     }
 
     /**
@@ -45,18 +44,13 @@ class HouseholdEdit {
      * @param array &$return Mảng tham chiếu để lưu thông báo lỗi
      * @return bool Trả về true nếu có thể xóa hộ gia đình, ngược lại trả về false
      */
-    public static function checkExits(array $item, array &$return): bool {
-        if (!empty($oldItem['id'])
+    public static function checkExists(array $item, array &$return): bool {
+        if (!empty($item['id'])
             && Data('Newbie.VinhptFee')->select([
                 'site' => portal()->id,
                 'householdId' => $item['id'],
-                'status' => 1, 2
+                'status' => [1, 2]
             ])) {
-            $return['message'] = 'Hộ gia đình vẫn còn nợ phí, không thể xóa';
-            return false;
-        }
-        return true;
-    }
 
     /**
      * Xác thực căn hộ được chọn còn trống hay không
@@ -100,7 +94,7 @@ class HouseholdEdit {
             $startTime = CDateTime($fields['startTime'])->time;
             $endTime = CDateTime($fields['endTime'])->time;
 
-            if ($endTime > $startTime) {
+            if ($endTime <= $startTime) {
                 $return['message'] = $return['errors']['fields[startTime]']
                     = 'Thời gian kết thúc phải lớn hơn thời gian bắt đầu';
                 return false;
