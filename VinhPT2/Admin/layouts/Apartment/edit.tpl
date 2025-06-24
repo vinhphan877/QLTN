@@ -8,12 +8,6 @@
                data-totalfloor="{totalFloor ?? ''}"
                class="form-control">
     </Layout.label>
-    <Layout.label label="Trạng thái" required=1>
-        <input class="form-control" type="Form.Select" name="fields[status]"
-               value="{status ?? ''}"
-               items="{\Samples\Newbie\VinhPT2\Enum\lib\ApartmentStatus::selectList()}"
-               description="-- {'Chọn trạng thái'} --">
-    </Layout.label>
     <Layout.label label="Tòa nhà" required="1">
         <input class="form-control" type="Form.Select"
                name="fields[buildingId]" service="Samples.Newbie.VinhPT2.Admin.Building.selectList"
@@ -30,9 +24,6 @@
                 maxlength: 255
             },
             'fields[floorNumber]': {
-                required: true
-            },
-            'fields[status]': {
                 required: true
             },
             'fields[buildingId]':{

@@ -8,7 +8,9 @@
 
 namespace Samples\Newbie\VinhPT2\Admin\lib;
 
+use Core\Enum\lib\Gender;
 use Data;
+use Samples\Newbie\VinhPT2\Enum\lib\ApartmentStatus;
 
 class ApartmentEdit {
     public static string $type = 'Newbie.VinhptApartment';
@@ -23,16 +25,20 @@ class ApartmentEdit {
     public static function checkRequired(array $fields, array &$return): bool {
         $requiredFields = [
             'title',
-            'floorNumber',
-            'status'
+            'floorNumber'
         ];
         $valid = true;
 
         foreach ($requiredFields as $field) {
             if (!isset($fields[$field])) {
-                $return['errors'][$field] = "Trường '{$field}' không được để trống.";
+                $return['errorsFields']['fields[' . $field . ']'] = "Trường $field không được để trống.";
                 $valid = false;
             }
+        }
+
+        if ($valid && !ApartmentStatus::getTitle($fields['status'])) {
+            $return['message'] = $return['errors']['fields[status]'] = 'Trạng thái căn hộ không hợp lệ!';
+            $valid = false;
         }
 
         return $valid;
@@ -83,6 +89,12 @@ class ApartmentEdit {
             }
         }
         return true;
+    }
+
+    public static function setDefaultStatus(array &$fields): void {
+        if (empty($fields['status'])) {
+            $fields['status'] = 0;
+        }
     }
 
     /**

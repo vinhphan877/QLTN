@@ -21,22 +21,18 @@ class Household extends CRUD {
         'orderBy' => 'createdTime DESC'
     ];
 
-    protected function checkDelete(array &$item, array &$return): bool {
-        return HouseholdEdit::checkExits($return, $item)
-            && parent::checkDelete($item, $return);
+    protected function editSuccess(array &$return, array $fields, array $oldItem): void {
+        if (!empty($fields['apartmentId'])) {
+            Data('Newbie.VinhptApartment')->update(['status' => 1],
+                ['_id' => $fields['apartmentId']]);
+        }
+        parent::editSuccess($return, $fields, $oldItem);
     }
 
     protected function deleteSuccess(array &$return, array &$item): void {
         if (!empty($item['apartmentId'])) {
-            Data('Newbie.VinhptApartment')->update(['status' => 1], $item['apartmentId']);
-        }
-
-        if (!empty($item['feeId'])) {
-            Data('Newbie.VinhptFee')->update(['status' => 1], $item['feeId']);
-        }
-
-        if (!empty($item['residentCommentId'])) {
-            Data('Newbie.VinhptResidentComment')->update(['status' => 1], $item['residentCommentId']);
+            Data('Newbie.VinhptApartment')->update(['status' => 0],
+                ['_id' => $item['apartmentId']]);
         }
         parent::deleteSuccess($return, $item);
     }
@@ -45,39 +41,27 @@ class Household extends CRUD {
         return HouseholdEdit::checkRequired($fields, $return)
             && HouseholdEdit::checkValidApartment($fields, $return)
             && HouseholdEdit::checkTime($fields, $return)
-            && HouseholdEdit::validateMembers($fields['members'] ?? [], $return)
+            && HouseholdEdit::checkExists($fields, $return, $oldItem)
             && parent::prepareEdit($fields, $oldItem, $return);
     }
 
     protected function prepareList(array &$return): void {
         if (!empty($return['items'])) {
-            static::addFields($return['items']);
             Gender::addTitle($return['items'], 'gender');
-            foreach ($return['items'] as &$item) {
-                if (!empty($item['members'])) {
-                    foreach ($item['members'] as &$member) {
-                        $member['genderTitle'] = Gender::getTitle($member['gender'] ?? '');
-                    }
-                }
-            }
+            static::addFields($return['items']);
         }
         parent::prepareList($return);
     }
 
-
     protected function checkItem(array &$item): bool {
-        $item['genderTitle'] = Gender::getTitle($item['gender'] ?? '');
+        Gender::addTitle($item, 'gender');
         return parent::checkItem($item);
     }
 
-    public static function addFields(array &$items): void {
-        foreach ($items as &$item) {
-            $item['gender'] = Gender::getTitle($item['gender'] ?? '');
-        }
+    protected static function addFields(array &$items): void {
         Data::getMoreFields('Newbie.VinhptApartment', $items, [
-            'apartmentId' => ['title' => 'apartmentTitle'],
+            'apartmentId' => ['title' => 'apartmentTitle']
         ]);
     }
 
-    // 9
 }

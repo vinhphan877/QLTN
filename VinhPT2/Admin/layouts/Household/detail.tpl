@@ -1,4 +1,4 @@
-<CMS.detail>
+<CMS.detail hideAddNew="1" hideReload="1" hideActions="1" hideCheckbox="1">
     <div class="panel panel-default">
         <div class="panel-heading">
             <h3 class="panel-title">Danh sách thành viên trong căn hộ</h3>

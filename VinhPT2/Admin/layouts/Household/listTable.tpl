@@ -1,11 +1,15 @@
-<CMS.Admin.list hideAddNew="1" hideReload="1" hideActions="1" hideCheckbox="1">
+<pre>
+    {print_r($params)}
+</pre>
+<CMS.Admin.list>
     <!--IF(!empty(items))-->
     <CMS.Admin.table>
         <region name="header">
             <th>Tên hộ gia đình</th>
-            <th>Thoời gian bắt đầu thuê</th>
-            <th>Thoời gian kết thúc thuê</th>
+            <th>Thời gian bắt đầu thuê</th>
+            <th>Thời gian kết thúc thuê</th>
             <th>Căn hộ</th>
+            <th>Chi tiết thành viên</th>
         </region>
         <td>{notag(items.title ?? '')}</td>
         <td>{notag(items.startTime ?? '')}</td>

@@ -44,10 +44,12 @@ class Apartment extends CRUD {
     }
 
     protected function prepareEdit(array &$fields, array &$oldItem, array &$return): bool {
+        ApartmentEdit::setDefaultStatus($fields);
         return ApartmentEdit::checkRequired($fields, $return)
             && ApartmentEdit::checkFloor($fields, $oldItem)
             && ApartmentEdit::checkExists($fields, $return, $oldItem)
             && ApartmentEdit::checkBuilding($fields, $return)
+            && ApartmentEdit::checkRoom($fields, $return)
             && parent::prepareEdit($fields, $oldItem, $return);
     }
 
