@@ -20,4 +20,20 @@ class ResidentComment extends CRUD {
         'orderBy' => 'createdTime DESC'
     ];
 
+    protected function prepareEdit(array &$fields, array &$oldItem, array &$return): bool {
+        return ResidentCommentEdit::checkRequired($fields, $return)
+            && ResidentCommentEdit::checkExists($fields, $return, $oldItem)
+            && parent::prepareEdit($fields, $oldItem, $return);
+    }
+
+    protected function prepareList(array &$return): void {
+        if (!empty($return['items'])) {
+            ResidentCommentEdit::addFields($return['items']);
+        }
+        parent::prepareList($return);
+    }
+
+    protected function checkDelete(array &$item, array &$return): bool {
+        return parent::checkDelete($item, $return);
+    }
 }

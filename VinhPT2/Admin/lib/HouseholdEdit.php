@@ -20,7 +20,7 @@ class HouseholdEdit {
      * @return bool Trả về true nếu tất cả trường bắt buộc hợp lệ, ngược lại trả về false
      */
     public static function checkRequired(array $fields, array &$return): bool {
-        $requiredFields = ['title', 'members', 'startTime', 'apartmentId'];
+        $requiredFields = ['title', 'startTime', 'apartmentId'];
         $valid = true;
 
         foreach ($requiredFields as $field) {
