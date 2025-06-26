@@ -1,3 +1,6 @@
+<pre>
+    {print_r($params)}
+</pre>
 <CMS.Admin.list hideAddNew="1" hideReload="1" hideActions="1" hideCheckbox="1">
     <!--IF(!empty(items))-->
     <CMS.Admin.table>
@@ -8,7 +11,7 @@
             <th>Trạng thái</th>
         </region>
         <td>{notag(items.title ?? '')}</td>
-        <td>{notag(items.titleComment ?? '')}</td>
+        <td>{notag(items.content ?? '')}</td>
         <td>{notag(items.content ?? '')}</td>
         <td>{notag(items.status ?? '')}</td>
     </CMS.Admin.table>

@@ -1,3 +1,6 @@
+<pre>
+    {print_r($params)}
+</pre>
 <CMS.Admin.list hideAddNew="1" hideReload="1" hideActions="1" hideCheckbox="1">
     <!--IF(!empty(items))-->
     <CMS.Admin.table>
@@ -16,12 +19,12 @@
             <a class="action" href="javascript:void(0);"
                title="{'Chi tiết'}"
                data-modal-class="modal-fullscreen"
-               data-x-modal="{quote(changeTail(layout, 'detail'))}"
+               data-x-modal="{(changeTail(layout, 'detail'))}"
                data-popup="1"
                data-filters-household-id="{items.householdId ?? ''}"
                data-x-popup="backdrop:'static',keyboard: false"
                data-service="Samples.Newbie.VinhPT2.Admin.Household.selectAll"
-               data-parameters="householdId:{items.householdId}"
+               data-household-id="{items.householdId ?? ''}"
                data-grid-module-parent-id="_MID_">
                 <i class="vi vi-eye vi-1_2x"></i>
             </a>

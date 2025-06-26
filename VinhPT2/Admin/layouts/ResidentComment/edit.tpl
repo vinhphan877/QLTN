@@ -14,10 +14,6 @@
         <input name="fields[content]" type="Form.Text" value="{content ?? ''}"
                placeholder="{'Nội dung'}" class="form-control money">
     </Layout.label>
-    <Layout.label label="Trạng Thái" required=1>
-        <input class="form-control" type="Form.Select" name="fields[status]"
-               value="{status ?? ''}" items="{\Samples\Newbie\VinhPT2\Enum\lib\FeedBackStatus::selectList()}">
-    </Layout.label>
 </CMS.edit>
 <script type="text/javascript">
     VHV.using({
@@ -29,9 +25,6 @@
                 required: true
             },
             'fields[content]': {
-                required: true
-            },
-            'fields[status]': {
                 required: true
             }
         },

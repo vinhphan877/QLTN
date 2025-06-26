@@ -17,7 +17,12 @@
     <li role="presentation"
         class="ant-tabs-tab
         <!--IF(CPage::$pageName === 'Samples.Newbie.VinhPT.Admin.Fee.list')--> active<!--/IF-->">
-        <a href="{url('Samples.Newbie.VinhPT2.Admin.Fee.list',['menuId','m'])}">{'Quản lý phí'}</a>
+        <a href="{url('Samples.Newbie.VinhPT2.Admin.Fee.list',['menuId','m'])}">{'Quản lý các loại phí'}</a>
+    </li>
+    <li role="presentation"
+        class="ant-tabs-tab
+        <!--IF(CPage::$pageName === 'Samples.Newbie.VinhPT2.Admin.Fee.detail')--> active<!--/IF-->">
+        <a href="{url('Samples.Newbie.VinhPT2.Admin.Fee.detail',['menuId','m'])}">{'Quản lý phí'}</a>
     </li>
     <li role="presentation"
         class="ant-tabs-tab

@@ -91,6 +91,11 @@ class ApartmentEdit {
         return true;
     }
 
+    /**
+     * Dặt trạng tha mặc định của căn hộ là chưa có người thuê khi tạo mới
+     * @author vinhpt
+     * @param array $fields
+     */
     public static function setDefaultStatus(array &$fields): void {
         if (empty($fields['status'])) {
             $fields['status'] = 0;

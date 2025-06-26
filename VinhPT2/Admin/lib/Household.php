@@ -64,4 +64,40 @@ class Household extends CRUD {
         ]);
     }
 
+    /**
+     * Lấy thông tin danh sách thành viên của một hộ gia đình
+     *
+     * @param array $household Mảng dữ liệu hộ gia đình
+     * @return array Danh sách thành viên với tên, tuổi và giới tính hiển thị
+     */
+    #[\Service]
+    function getHouseholdMembers(array $household): array {
+        $members = [];
+
+        if (!empty($household['members']) && is_array($household['members'])) {
+            foreach ($household['members'] as $member) {
+                $name = $member['name'] ?? 'Không rõ';
+                $age = $member['age'] ?? 'Không rõ';
+                $gender = $member['gender'] ?? '';
+
+                if ($gender === 0 || $gender === '0' || Gender::getTitle($gender) === 'Nam') {
+                    $genderText = 'Nam';
+                } elseif ($gender === 1 || $gender === '1' || Gender::getTitle($gender) === 'Nữ') {
+                    $genderText = 'Nữ';
+                } else {
+                    $genderText = 'Khác';
+                }
+
+                $members[] = [
+                    'name' => $name,
+                    'age' => $age,
+                    'gender' => $genderText
+                ];
+            }
+        }
+
+        return $members;
+    }
+
+
 }

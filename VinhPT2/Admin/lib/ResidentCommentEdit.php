@@ -24,7 +24,6 @@ class ResidentCommentEdit {
     public static function checkRequired(array $fields, array &$return): bool {
         $requiredFields = [
             'title',
-            'status',
             'householdId'
         ];
         $valid = true;
@@ -77,5 +76,16 @@ class ResidentCommentEdit {
         Data::getMoreFields('Newbie.VinhptHousehold', $items, [
             'householdId' => ['title' => 'householdName']
         ]);
+    }
+
+    /**
+     * Đặt trạng thái của đơn khiếu nại thành chưa giải quyết khi tạo mới
+     * @author vinhpt
+     * @param array $fields
+     */
+    public static function setDefaultStatus(array &$fields): void {
+        if (empty($fields['status'])) {
+            $fields['status'] = 0;
+        }
     }
 }

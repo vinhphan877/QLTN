@@ -21,6 +21,7 @@ class ResidentComment extends CRUD {
     ];
 
     protected function prepareEdit(array &$fields, array &$oldItem, array &$return): bool {
+        ResidentCommentEdit::setDefaultStatus($fields);
         return ResidentCommentEdit::checkRequired($fields, $return)
             && ResidentCommentEdit::checkExists($fields, $return, $oldItem)
             && parent::prepareEdit($fields, $oldItem, $return);
@@ -36,4 +37,5 @@ class ResidentComment extends CRUD {
     protected function checkDelete(array &$item, array &$return): bool {
         return parent::checkDelete($item, $return);
     }
+
 }
