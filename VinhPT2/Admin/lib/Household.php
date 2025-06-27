@@ -11,6 +11,7 @@ namespace Samples\Newbie\VinhPT2\Admin\lib;
 use Core\Enum\lib\Gender;
 use Data;
 use Data\lib\CRUD;
+use Samples\Newbie\VinhPT2\Enum\lib\ApartmentStatus;
 
 class Household extends CRUD {
     public static string $type = 'Newbie.VinhptHousehold';
@@ -18,6 +19,7 @@ class Household extends CRUD {
     public static array $options = [
         'itemsPerPage' => 20,
         'pageNo' => 1,
+        'fields' => '*',
         'orderBy' => 'createdTime DESC'
     ];
 
@@ -39,22 +41,22 @@ class Household extends CRUD {
 
     protected function prepareEdit(array &$fields, array &$oldItem, array &$return): bool {
         return HouseholdEdit::checkRequired($fields, $return)
-            && HouseholdEdit::checkValidApartment($fields, $return)
-            && HouseholdEdit::checkTime($fields, $return)
+            && HouseholdEdit::checkValidApartment($fields, $return, $oldItem)
+            && HouseholdEdit::checkTime($fields, $return, $oldItem)
             && HouseholdEdit::checkExists($fields, $return, $oldItem)
             && parent::prepareEdit($fields, $oldItem, $return);
     }
 
     protected function prepareList(array &$return): void {
         if (!empty($return['items'])) {
-            Gender::addTitle($return['items'], 'gender');
             static::addFields($return['items']);
         }
         parent::prepareList($return);
     }
 
     protected function checkItem(array &$item): bool {
-        Gender::addTitle($item, 'gender');
+        $items = [&$item];
+        static::addFields($items);
         return parent::checkItem($item);
     }
 
@@ -64,33 +66,17 @@ class Household extends CRUD {
         ]);
     }
 
-    /**
-     * Lấy thông tin danh sách thành viên của một hộ gia đình
-     *
-     * @param array $household Mảng dữ liệu hộ gia đình
-     * @return array Danh sách thành viên với tên, tuổi và giới tính hiển thị
-     */
     #[\Service]
     function getHouseholdMembers(array $household): array {
         $members = [];
 
         if (!empty($household['members']) && is_array($household['members'])) {
             foreach ($household['members'] as $member) {
-                $name = $member['name'] ?? 'Không rõ';
-                $age = $member['age'] ?? 'Không rõ';
-                $gender = $member['gender'] ?? '';
-
-                if ($gender === 0 || $gender === '0' || Gender::getTitle($gender) === 'Nam') {
-                    $genderText = 'Nam';
-                } elseif ($gender === 1 || $gender === '1' || Gender::getTitle($gender) === 'Nữ') {
-                    $genderText = 'Nữ';
-                } else {
-                    $genderText = 'Khác';
-                }
+                $genderText = Gender::getTitle($member['gender'] ?? '') ?? 'Khác';
 
                 $members[] = [
-                    'name' => $name,
-                    'age' => $age,
+                    'name' => $member['name'] ?? 'Không rõ',
+                    'age' => $member['age'] ?? 'Không rõ',
                     'gender' => $genderText
                 ];
             }
@@ -98,6 +84,5 @@ class Household extends CRUD {
 
         return $members;
     }
-
 
 }

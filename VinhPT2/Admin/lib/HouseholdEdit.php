@@ -9,6 +9,7 @@
 namespace Samples\Newbie\VinhPT2\Admin\lib;
 
 use Data;
+use Samples\Newbie\VinhPT2\Enum\lib\ApartmentStatus;
 
 class HouseholdEdit {
     public static string $type = 'Newbie.VinhptHousehold';
@@ -31,10 +32,13 @@ class HouseholdEdit {
         }
 
         if (!empty($fields['members'])) {
-            foreach ($fields['members'] as $member) {
+            foreach ($fields['members'] as $index => $member) {
                 if (empty($member['name']) || !isset($member['age']) || !isset($member['gender'])) {
-                    $return['message'] = 'Vui lòng điền đầy đủ thông tin thành viên';
+                    $return['message'] = "Vui lòng điền đầy đủ thông tin cho tất cả thành viên. Lỗi ở thành viên số "
+                        . ($index + 1)
+                        . ".";
                     $valid = false;
+                    break;
                 }
             }
         }
@@ -43,40 +47,67 @@ class HouseholdEdit {
     }
 
     /**
-     * Kiểm tra tình trạng sẵn có của căn hộ
-     * @param array $fields Mảng chứa thông tin dữ liệu cần kiểm tra
+     * Kiểm tra tình trạng sẵn có của căn hộ.
+     * Căn hộ phải trống (status = 0) trừ khi đó là căn hộ đã được gán cho chính hộ gia đình này.
+     * @param array $fields Mảng chứa thông tin dữ liệu cần kiểm tra (bao gồm apartmentId)
      * @param array $return Mảng tham chiếu để lưu thông báo lỗi, nếu có
-     * @return bool Trả về true nếu căn hộ còn trống, ngược lại trả về false
+     * @param array $oldItem Dữ liệu cũ của hộ gia đình trước khi chỉnh sửa
+     * @return bool Trả về true nếu căn hộ hợp lệ, ngược lại trả về false
      */
-    public static function checkValidApartment(array $fields, array &$return): bool {
-        if (!empty($fields['apartmentId'])) {
-            $apartment = Data('Newbie.VinhptApartment')->select([
-                '_id' => Data::objectId($fields['apartmentId']),
-                'status' => 1
-            ]);
-
-            if (!empty($apartment)) {
-                $return['message'] = 'Căn hộ đã có người thuê';
-                return false;
-            }
+    public static function checkValidApartment(array $fields, array &$return, array $oldItem): bool {
+        if (empty($fields['apartmentId'])) {
+            return true;
         }
+
+        if (!empty($oldItem['apartmentId']) && $fields['apartmentId'] === $oldItem['apartmentId']) {
+            return true;
+        }
+
+        $apartment = Data('Newbie.VinhptApartment')->select([
+            '_id' => $fields['apartmentId']
+        ]);
+
+        if (empty($apartment)) {
+            $return['message'] = 'Căn hộ được chọn không tồn tại.';
+            return false;
+        }
+
+        if ($apartment['status'] == 1) {
+            $return['message'] = 'Căn hộ đã có người thuê.';
+            return false;
+        }
+
         return true;
     }
 
-    /**
-     * Kiểm tra ràng buộc thời gian
-     * @param array $fields Mảng chứa thông tin dữ liệu cần kiểm tra
-     * @param array $return Mảng tham chiếu để lưu thông báo lỗi, nếu có
-     * @return bool Trả về true nếu thời gian hợp lệ, ngược lại trả về false
-     */
-    public static function checkTime(array $fields, array &$return): bool {
+    public static function checkTime(array $fields, array $oldItem, array &$return): bool {
         if (!empty($fields['startTime']) && !empty($fields['endTime'])) {
             $startTime = CDateTime($fields['startTime'])->time;
             $endTime = CDateTime($fields['endTime'])->time;
-
-            if ($endTime <= $startTime) {
-                $return['message'] =
-                $return['errors']['fields[endTime]'] = 'Thời gian kết thúc phải lớn hơn thời gian bắt đầu';
+            $filters = [
+                'site' => portal()->id,
+                'apartmentId' => $fields['apartmentId'],
+                '$or' => [
+                    [
+                        'startTime' => ['$gte' => $startTime],
+                        'endTime' => ['$lte' => $endTime],
+                    ],
+                    [
+                        'startTime' => ['$lte' => $endTime],
+                        'endTime' => ['$gte' => $startTime, '$lte' => $endTime],
+                    ],
+                    [
+                        'startTime' => ['$gte' => $startTime, '$lte' => $endTime],
+                        'endTime' => ['$gte' => $endTime],
+                    ],
+                ]
+            ];
+            if (!empty($oldItem)) {
+                $filters['_id'] = ['$ne' => Data::objectId($oldItem['id'])];
+            }
+            if (Data(static::$type)->select($filters)) {
+                $return['message'] = $return['errors']['fields[startTime]']
+                    = 'Căn hộ hiện tại đã có người thuê trong khoảng thời gian này';
                 return false;
             }
         }

@@ -1,7 +1,4 @@
-<pre>
-    {print_r($params)}
-</pre>
-<CMS.Admin.list hideAddNew="1" hideReload="1" hideActions="1" hideCheckbox="1">
+<CMS.Admin.list hideReload="1" hideAdd="1" hideSort="1">
     <!--IF(!empty(items))-->
     <CMS.Admin.table>
         <region name="header">
