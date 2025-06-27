@@ -10,6 +10,7 @@ namespace Samples\Newbie\VinhPT2\Admin\lib;
 
 use Data;
 use Data\lib\CRUD;
+use Samples\Newbie\VinhPT2\Enum\lib\FeeStatus;
 
 class Fee extends CRUD {
     public static string $type = 'Newbie.VinhptFee';
@@ -26,22 +27,26 @@ class Fee extends CRUD {
     }
 
     protected function prepareEdit(array &$fields, array &$oldItem, array &$return): bool {
-        $household = $oldItem['householdId'] ?? 0;
         return FeeEdit::checkRequired($fields, $return)
-            && FeeEdit::checkTime($fields, $return, $household)
+            && FeeEdit::checkTime($fields, $return)
             && parent::prepareEdit($fields, $oldItem, $return);
     }
 
     protected function addFields(array &$items): void {
-        Data::getMoreFields('Newbie.Household', $items, [
+        Data::getMoreFields('Newbie.VinhptHousehold', $items, [
             'householdId' => ['title' => 'householdTitle'],
+        ]);
+        Data::getMoreFields('Newbie.VinhptFeeType', $items, [
+            'feeTypesId' => ['title' => 'feeTypeTitle', 'price' => 'feeTypePrice'],
         ]);
     }
 
     protected function prepareList(array &$return): void {
         parent::prepareList($return);
-        $this->addFields($return['items']);
+        if (!empty($return['items'])) {
+            FeeStatus::addTitle($return['items'], 'status');
+            $this->addFields($return['items']);
+        }
     }
-
 
 }

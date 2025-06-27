@@ -8,6 +8,8 @@
 
 namespace Samples\Newbie\VinhPT2\Admin\lib;
 
+use Data;
+
 class FeeEdit {
     /**
      * Kiểm tra trạng thái fee trước khi xóa
@@ -18,7 +20,7 @@ class FeeEdit {
      */
     public static function validateStatus(array $item, array &$return): bool {
         if (isset($item['status']) && in_array($item['status'], [1, 2])) {
-            $return['message'] = 'Không thể xóa khi trạng thái là 1 hoặc 2';
+            $return['message'] = 'Không thể xóa khi trạng thái là chưa trả hoặc quá hạn';
             return false;
         }
         return true;
@@ -32,7 +34,7 @@ class FeeEdit {
      * @return bool Trả về false nếu thiếu trường bắt buộc, ngược lại trả về true
      */
     public static function checkRequired(array $fields, array &$return): bool {
-        $required = ['title', 'amount', 'submissionTime', 'householdId', 'feeTypesId'];
+        $required = ['title', 'submissionTime', 'householdId', 'feeTypesId'];
         foreach ($required as $field) {
             if (empty($fields[$field])) {
                 $return['message'] = "Trường $field là bắt buộc";
@@ -46,11 +48,20 @@ class FeeEdit {
      * Kiểm tra tính hợp lệ của thời gian nộp phí với thời gian thuê của hộ gia đình
      *
      * @param array $fields Mảng chứa thông tin thời gian nộp phí
-     * @param array $household Mảng chứa thông tin thời gian thuê của hộ gia đình
      * @param array &$return Mảng tham chiếu để lưu thông báo lỗi
      * @return bool Trả về false nếu thời gian không hợp lệ, ngược lại trả về true
      */
-    public static function checkTime(array $fields, array $household, array &$return): bool {
+    public static function checkTime(array $fields, array &$return): bool {
+        if (empty($fields['submissionTime']) || empty($fields['householdId'])) {
+            return true;
+        }
+        $household = Data('Newbie.VinhptHousehold')->select([
+            '_id' => Data::objectId($fields['householdId'])
+        ]);
+        if (empty($household)) {
+            $return['message'] = 'Hộ gia đình không tồn tại';
+            return false;
+        }
         if ($fields['submissionTime'] < $household['startTime']
             || $fields['submissionTime'] > $household['endTime']) {
             $return['message'] = 'Thời gian nộp phí phải nằm trong thời gian thuê của hộ gia đình';
