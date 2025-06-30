@@ -25,7 +25,7 @@ class FeeTypeEdit {
      * @return bool
      */
     public static function checkRequired(array $fields, array &$return): bool {
-        $requiredFields = ['title', 'price', 'status', 'deadline_start_day', 'deadline_end_day'];
+        $requiredFields = ['title', 'price', 'deadlineStartDay', 'deadlineEndDay'];
         foreach ($requiredFields as $field) {
             if (!isset($fields[$field]) || $fields[$field] === '') {
                 $return['errors']['fields[' . $field . ']'] = "Trường này không được để trống.";
@@ -33,6 +33,12 @@ class FeeTypeEdit {
             }
         }
         return true;
+    }
+
+    public static function setDefaultStatus(array &$fields): void {
+        if (empty($fields['status'])) {
+            $fields['status'] = 0;
+        }
     }
 
     /**
@@ -59,18 +65,18 @@ class FeeTypeEdit {
      * @return bool
      */
     public static function checkDeadline(array $fields, array &$return): bool {
-        $start = (int)($fields['deadline_start_day'] ?? 0);
-        $end = (int)($fields['deadline_end_day'] ?? 0);
+        $start = (int)($fields['deadlineStartDay'] ?? 0);
+        $end = (int)($fields['deadlineEndDay'] ?? 0);
 
         if ($start < 1 || $start > 31 || $end < 1 || $end > 31) {
             $return['message'] = 'Ngày hạn nộp phải là một ngày hợp lệ trong tháng (từ 1 đến 31).';
-            $return['errors']['fields[deadline_start_day]'] = 'Ngày không hợp lệ.';
+            $return['errors']['fields[deadlineStartDay]'] = 'Ngày không hợp lệ.';
             return false;
         }
 
         if ($start > $end) {
             $return['message'] = 'Ngày bắt đầu hạn nộp phải trước hoặc bằng ngày kết thúc.';
-            $return['errors']['fields[deadline_end_day]'] = 'Ngày kết thúc phải sau ngày bắt đầu.';
+            $return['errors']['fields[deadlineEndDay]'] = 'Ngày kết thúc phải sau ngày bắt đầu.';
             return false;
         }
         return true;

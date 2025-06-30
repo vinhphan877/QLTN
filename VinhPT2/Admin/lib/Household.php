@@ -64,8 +64,14 @@ class Household extends CRUD {
         ]);
     }
 
+    /**
+     * Lấy thông tin cư dân trong hộ gia đình
+     * @author vinhpt
+     * @param array $household
+     * @return array
+     */
     #[\Service]
-    function getHouseholdMembers(array $household): array {
+    public function getHouseholdMembers(array $household): array {
         $members = [];
 
         if (!empty($household['members']) && is_array($household['members'])) {
@@ -138,6 +144,11 @@ class Household extends CRUD {
         return $finalReport;
     }
 
+    /**
+     * Lấy danh sách cư dân theo giới tính
+     * @author vinhpt
+     * @return array
+     */
     #[\Service]
     public function getResidentReportByGender(): array {
         $pipeline = [
@@ -168,7 +179,7 @@ class Household extends CRUD {
 
                 $finalReport[] = [
                     'gender' => $genderTitle,
-                    'count' => $item['count']
+                    'count' => $item['gender ']
                 ];
             }
         }

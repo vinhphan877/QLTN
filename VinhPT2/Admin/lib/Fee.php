@@ -55,15 +55,14 @@ class Fee extends CRUD {
     }
 
     protected static function getTotalUnPaidFee(array &$item): void {
-        $feeTypes = Data('Newbie.VinhptFeeTypes')->select(['_id' => Data::objectId($item['feeTypesId'])]);
-        $feeTypes = $feeTypes['feeTypes'] ?? [];
+        $fees = Data('Newbie.VinhptFee')->select(['_id' => Data::objectId($item['feeId'])]);
+        $fees = $fees['fees'] ?? [];
         $total = 0;
-        foreach ($feeTypes as $feeType) {
-            $total += $feeType['ammount'] ?? 0;
+        foreach ($fees as $fee) {
+            $total += $fee['ammount'] ?? 0;
         }
         $item['totalUnPaidFee'] = $total;
     }
-
 
 
 }
