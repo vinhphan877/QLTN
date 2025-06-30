@@ -1,9 +1,11 @@
 <?php
 /**
+ * Model cho Module Quản lý Loại phí.
  *
- * @author vinhpt
- * @date 6/27/2025
- * @time 9:37 AM
+ * @author      vinhpt
+ * @subpackage  Admin\lib
+ * @package     Samples\Newbie\VinhPT2
+ * @since       2025-06-27
  */
 
 namespace Samples\Newbie\VinhPT2\Admin\lib;
@@ -23,6 +25,8 @@ class FeeType extends CRUD {
 
     protected function prepareEdit(array &$fields, array &$oldItem, array &$return): bool {
         return FeeTypeEdit::checkRequired($fields, $return)
+            && FeeTypeEdit::checkTitleLength($fields, $return)
+            && FeeTypeEdit::checkDeadline($fields, $return)
             && FeeTypeEdit::checkExists($fields, $return, $oldItem)
             && parent::prepareEdit($fields, $oldItem, $return);
     }

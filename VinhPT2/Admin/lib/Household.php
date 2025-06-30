@@ -11,6 +11,7 @@ namespace Samples\Newbie\VinhPT2\Admin\lib;
 use Core\Enum\lib\Gender;
 use Data;
 use Data\lib\CRUD;
+use Samples\Newbie\VinhPT2\Enum\lib\ApartmentStatus;
 
 class Household extends CRUD {
     public static string $type = 'Newbie.VinhptHousehold';
@@ -24,16 +25,20 @@ class Household extends CRUD {
 
     protected function editSuccess(array &$return, array $fields, array $oldItem): void {
         if (!empty($fields['apartmentId'])) {
-            Data('Newbie.VinhptApartment')->update(['status' => 1],
-                ['_id' => $fields['apartmentId']]);
+            Data('Newbie.VinhptApartment')->update(
+                ['status' => ApartmentStatus::RENTED->value],
+                ['_id' => $fields['apartmentId']]
+            );
         }
         parent::editSuccess($return, $fields, $oldItem);
     }
 
     protected function deleteSuccess(array &$return, array &$item): void {
         if (!empty($item['apartmentId'])) {
-            Data('Newbie.VinhptApartment')->update(['status' => 0],
-                ['_id' => $item['apartmentId']]);
+            Data('Newbie.VinhptApartment')->update(
+                ['status' => ApartmentStatus::NOTRENT->value],
+                ['_id' => $item['apartmentId']]
+            );
         }
         parent::deleteSuccess($return, $item);
     }
@@ -74,7 +79,6 @@ class Household extends CRUD {
                 ];
             }
         }
-
         return $members;
     }
 

@@ -1,3 +1,6 @@
+<pre>
+    {print_r($params)}
+</pre>
 <CMS.Admin.list hideReload="1" hideAdd="1" hideSort="1">
     <!--IF(!empty(items))-->
     <CMS.Admin.table>

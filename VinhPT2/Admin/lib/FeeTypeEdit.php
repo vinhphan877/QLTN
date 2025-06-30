@@ -1,11 +1,12 @@
 <?php
 /**
+ * Lớp hỗ trợ kiểm tra dữ liệu (validation) cho Module Quản lý Loại phí.
  *
- * @author vinhpt
- * @date 6/27/2025
- * @time 9:37 AM
+ * @package     Samples\Newbie\VinhPT2
+ * @subpackage  Admin\lib
+ * @author      vinhpt
+ * @since       2025-06-27
  */
-
 namespace Samples\Newbie\VinhPT2\Admin\lib;
 
 use Data;
@@ -16,40 +17,71 @@ class FeeTypeEdit {
     public static string $type = 'Newbie.VinhptFeeType';
 
     /**
-     * Kiểm tra các trường bắt buộc trong form
-     * @param array $fields Mảng chứa thông tin dữ liệu cần kiểm tra
-     * @param array $return Mảng tham chiếu để lưu thông báo lỗi, nếu có
-     * @return bool Trả về true nếu tất cả trường bắt buộc hợp lệ, ngược lại trả về false
+     * Kiểm tra các trường bắt buộc.
+     * @author vinhpt
+     * @param array $fields
+     * @param array $return
+     * @return bool
      */
     public static function checkRequired(array $fields, array &$return): bool {
-        $requiredFields = [
-            'title',
-            'price',
-            'status'
-        ];
-        $valid = true;
-
+        $requiredFields = ['title', 'price', 'status', 'deadline_start_day', 'deadline_end_day'];
         foreach ($requiredFields as $field) {
-            if (empty($fields[$field])) {
-                $return['errorsFields']['fields[' . $field . ']'] = "Trường $field không được để trống.";
-                $valid = false;
+            if (!isset($fields[$field]) || $fields[$field] === '') {
+                $return['errors']['fields[' . $field . ']'] = "Trường này không được để trống.";
+                return false;
             }
         }
-
-        if ($valid && !FeeTypeStatus::getTitle($fields['status'])) {
-            $return['message'] = $return['errors']['fields[status]'] = 'Trạng thái loại phí không hợp lệ!';
-            $valid = false;
-        }
-
-        return $valid;
+        return true;
     }
 
     /**
-     * Kiểm tra sự tồn tại của loại phí
-     * @param array $fields Mảng chứa thông tin loại phí cần kiểm tra
-     * @param array $return Mảng tham chiếu để lưu thông báo lỗi, nếu có
-     * @param array $oldItem Mảng chứa thông tin loại phí cũ (nếu có)
-     * @return bool Trả về true nếu loại phí chưa tồn tại, ngược lại trả về false
+     * Kiểm tra độ dài tối đa của tên loại phí.
+     * @author vinhpt
+     * @param array $fields
+     * @param array $return
+     * @return bool
+     */
+    public static function checkTitleLength(array $fields, array &$return): bool {
+        if (!empty($fields['title']) && mb_strlen($fields['title']) > 225) {
+            $return['message'] = 'Tên loại phí không được vượt quá 225 ký tự.';
+            $return['errors']['fields[title]'] = 'Độ dài tối đa là 225 ký tự.';
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Kiểm tra tính hợp lệ của hạn nộp.
+     * @author vinhpt
+     * @param array $fields
+     * @param array $return
+     * @return bool
+     */
+    public static function checkDeadline(array $fields, array &$return): bool {
+        $start = (int)($fields['deadline_start_day'] ?? 0);
+        $end = (int)($fields['deadline_end_day'] ?? 0);
+
+        if ($start < 1 || $start > 31 || $end < 1 || $end > 31) {
+            $return['message'] = 'Ngày hạn nộp phải là một ngày hợp lệ trong tháng (từ 1 đến 31).';
+            $return['errors']['fields[deadline_start_day]'] = 'Ngày không hợp lệ.';
+            return false;
+        }
+
+        if ($start > $end) {
+            $return['message'] = 'Ngày bắt đầu hạn nộp phải trước hoặc bằng ngày kết thúc.';
+            $return['errors']['fields[deadline_end_day]'] = 'Ngày kết thúc phải sau ngày bắt đầu.';
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Kiểm tra sự tồn tại của loại phí.
+     * @author vinhpt
+     * @param array $fields
+     * @param array $return
+     * @param array $oldItem
+     * @return bool
      */
     public static function checkExists(array $fields, array &$return, array $oldItem): bool {
         if (!empty($fields['title'])) {
@@ -57,15 +89,15 @@ class FeeTypeEdit {
                 'site' => portal()->id,
                 'title' => $fields['title']
             ];
-            if (!empty($oldItem)) {
+            if (!empty($oldItem['id'])) {
                 $filters['_id'] = ['$ne' => Data::objectId($oldItem['id'])];
             }
             if (Data(static::$type)->select($filters)) {
-                $return['message'] = $return['errors']['fields[title]'] = 'Loại phí này đã tồn tại.';
+                $return['message'] = 'Loại phí này đã tồn tại.';
+                $return['errors']['fields[title]'] = 'Loại phí này đã tồn tại.';
                 return false;
             }
         }
         return true;
     }
-
 }

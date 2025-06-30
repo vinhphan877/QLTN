@@ -21,23 +21,28 @@ class Fee extends CRUD {
         'orderBy' => 'createdTime DESC'
     ];
 
-    protected function checkDelete(array &$item, array &$return): bool {
-        return FeeEdit::validateStatus($item, $return)
-            && parent::checkDelete($item, $return);
+    protected function prepareEdit(array &$fields, array &$oldItem, array &$return): bool {
+        if (!FeeEdit::checkRequired($fields, $return)) {
+            return false;
+        }
+
+        $household = Data('Newbie.VinhptHousehold')->select(['_id' => Data::objectId($fields['householdId'])]);
+
+        return FeeEdit::checkTime($fields, $household, $return)
+            && parent::prepareEdit($fields, $oldItem, $return);
     }
 
-    protected function prepareEdit(array &$fields, array &$oldItem, array &$return): bool {
-        return FeeEdit::checkRequired($fields, $return)
-            && FeeEdit::checkTime($fields, $return)
-            && parent::prepareEdit($fields, $oldItem, $return);
+    protected function checkDelete(array &$item, array &$return): bool {
+        return FeeEdit::validateStatusOnDelete($item, $return)
+            && parent::checkDelete($item, $return);
     }
 
     protected function addFields(array &$items): void {
         Data::getMoreFields('Newbie.VinhptHousehold', $items, [
             'householdId' => ['title' => 'householdTitle'],
         ]);
-        Data::getMoreFields('Newbie.VinhptFeeType', $items, [
-            'feeTypesId' => ['title' => 'feeTypeTitle', 'price' => 'feeTypePrice'],
+        Data::getMoreFields('Newbie.VinhptFeeTypes', $items, [
+            'feeTypesId' => ['title' => 'feeTypeTitle'],
         ]);
     }
 
