@@ -1,17 +1,8 @@
 <?php
-/**
- * Lớp hỗ trợ kiểm tra dữ liệu (validation) cho Module Quản lý Loại phí.
- *
- * @author      vinhpt
- * @subpackage  Admin\lib
- * @package     Samples\Newbie\VinhPT2
- * @since       2025-06-27
- */
 
 namespace Samples\Newbie\VinhPT2\Admin\lib;
 
 use Data;
-use Samples\Newbie\VinhPT2\Enum\lib\FeeTypeStatus;
 
 class FeeTypeEdit {
 
@@ -25,7 +16,7 @@ class FeeTypeEdit {
      * @return bool
      */
     public static function checkRequired(array $fields, array &$return): bool {
-        $requiredFields = ['title', 'price', 'deadlineStartDay', 'deadlineEndDay'];
+        $requiredFields = ['title', 'price', 'deadline'];
         foreach ($requiredFields as $field) {
             if (!isset($fields[$field]) || $fields[$field] === '') {
                 $return['errors']['fields[' . $field . ']'] = "Trường này không được để trống.";
@@ -58,6 +49,7 @@ class FeeTypeEdit {
     }
 
     /**
+     *Y svhrdee
      * Kiểm tra tính hợp lệ của hạn nộp.
      * @author vinhpt
      * @param array $fields

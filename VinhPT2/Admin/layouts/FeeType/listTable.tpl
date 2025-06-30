@@ -1,3 +1,6 @@
+<pre>
+    {print_r($params)}
+</pre>
 <CMS.Admin.table>
     <region name="header">
         <th>Tên loại phí</th>
