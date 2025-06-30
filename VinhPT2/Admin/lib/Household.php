@@ -82,4 +82,98 @@ class Household extends CRUD {
         return $members;
     }
 
+    /**
+     * Lấy danh sách cư dân theo độ tuổi
+     * @author vinhpt
+     * @return array|array[]
+     */
+    #[\Service]
+    public function getResidentReportByAgeGroup(): array {
+        $pipeline = [
+            ['$unwind' => '$members'],
+            ['$replaceRoot' => ['newRoot' => '$members']],
+            [
+                '$facet' => [
+                    'group_0_6' => [
+                        ['$match' => ['age' => ['$gt' => 0, '$lte' => 6]]],
+                        ['$sort' => ['age' => 1]]
+                    ],
+                    'group_7_12' => [
+                        ['$match' => ['age' => ['$gt' => 6, '$lte' => 12]]],
+                        ['$sort' => ['age' => 1]]
+                    ],
+                    'group_13_18' => [
+                        ['$match' => ['age' => ['$gt' => 12, '$lte' => 18]]],
+                        ['$sort' => ['age' => 1]]
+                    ],
+                    'group_19_24' => [
+                        ['$match' => ['age' => ['$gt' => 18, '$lte' => 24]]],
+                        ['$sort' => ['age' => 1]]
+                    ],
+                    'group_25_60' => [
+                        ['$match' => ['age' => ['$gt' => 24, '$lte' => 60]]],
+                        ['$sort' => ['age' => 1]]
+                    ],
+                    'group_over_60' => [
+                        ['$match' => ['age' => ['$gt' => 60]]],
+                        ['$sort' => ['age' => 1]]
+                    ]
+                ]
+            ]
+        ];
+
+        $aggregationResult = Data(static::$type)->aggregate($pipeline);
+
+        $result = $aggregationResult[0] ?? [];
+
+        $finalReport = [
+            '0-6 tuổi' => $result['group_0_6'] ?? [],
+            '7-12 tuổi' => $result['group_7_12'] ?? [],
+            '13-18 tuổi' => $result['group_13_18'] ?? [],
+            '19-24 tuổi' => $result['group_18_24'] ?? [],
+            '25-60 tuổi' => $result['group_25_60'] ?? [],
+            'Trên 60 tuổi' => $result['group_over_60'] ?? [],
+        ];
+
+        return $finalReport;
+    }
+
+    #[\Service]
+    public function getResidentReportByGender(): array {
+        $pipeline = [
+            ['$unwind' => '$members'],
+            [
+                '$group' => [
+                    '_id' => '$members.gender',
+                    'count' => ['$sum' => 1]
+                ]
+            ],
+            [
+                '$sort' => [
+                    '_id' => 1
+                ]
+            ]
+        ];
+
+        $aggregationResult = Data(static::$type)->aggregate($pipeline);
+
+        $finalReport = [];
+        if (!empty($aggregationResult)) {
+            foreach ($aggregationResult as $item) {
+                $genderTitle = Gender::getTitle($item['_id']);
+
+                if ($item['_id'] === '' || $genderTitle === '') {
+                    continue;
+                }
+
+                $finalReport[] = [
+                    'gender' => $genderTitle,
+                    'count' => $item['count']
+                ];
+            }
+        }
+
+        return $finalReport;
+    }
+
 }

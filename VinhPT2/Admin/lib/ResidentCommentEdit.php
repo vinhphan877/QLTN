@@ -69,16 +69,6 @@ class ResidentCommentEdit {
     }
 
     /**
-     * Thêm trường dữ liệu hộ gia đình vào danh sách góp ý
-     * @param array $items Mảng tham chiếu chứa danh sách các góp ý
-     */
-    public static function addFields(array &$items): void {
-        Data::getMoreFields('Newbie.VinhptHousehold', $items, [
-            'householdId' => ['title' => 'householdName']
-        ]);
-    }
-
-    /**
      * Đặt trạng thái của đơn khiếu nại thành chưa giải quyết khi tạo mới
      * @author vinhpt
      * @param array $fields

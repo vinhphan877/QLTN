@@ -8,6 +8,7 @@
 
 namespace Samples\Newbie\VinhPT2\Admin\lib;
 
+use Data;
 use Data\lib\CRUD;
 
 class ResidentComment extends CRUD {
@@ -29,13 +30,26 @@ class ResidentComment extends CRUD {
 
     protected function prepareList(array &$return): void {
         if (!empty($return['items'])) {
-            ResidentCommentEdit::addFields($return['items']);
+            static::addFields($return['items']);
         }
         parent::prepareList($return);
     }
 
-    protected function checkDelete(array &$item, array &$return): bool {
-        return parent::checkDelete($item, $return);
+    protected static function getUnProcessedCommentsList(array &$items): void {
+        $items = array_filter($items, function ($item) {
+            return $item['status'] === 0;
+        });
     }
 
+    protected static function getProcessedCommentsList(array &$items): void {
+        $items = array_filter($items, function ($item) {
+            return $item['status'] === 1;
+        });
+    }
+
+    public static function addFields(array &$items): void {
+        Data::getMoreFields('Newbie.VinhptHousehold', $items, [
+            'householdId' => ['title' => 'householdName']
+        ]);
+    }
 }

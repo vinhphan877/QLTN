@@ -2,11 +2,12 @@
 /**
  * Lớp hỗ trợ kiểm tra dữ liệu (validation) cho Module Quản lý Loại phí.
  *
- * @package     Samples\Newbie\VinhPT2
- * @subpackage  Admin\lib
  * @author      vinhpt
+ * @subpackage  Admin\lib
+ * @package     Samples\Newbie\VinhPT2
  * @since       2025-06-27
  */
+
 namespace Samples\Newbie\VinhPT2\Admin\lib;
 
 use Data;
@@ -100,4 +101,5 @@ class FeeTypeEdit {
         }
         return true;
     }
+
 }
