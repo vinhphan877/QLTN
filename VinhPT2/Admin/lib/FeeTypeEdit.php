@@ -19,6 +19,7 @@ class FeeTypeEdit {
         $requiredFields = ['title', 'price', 'deadline'];
         foreach ($requiredFields as $field) {
             if (!isset($fields[$field]) || $fields[$field] === '') {
+                $return['message'] = "Thiếu trường bắt buộc: $field";
                 $return['errors']['fields[' . $field . ']'] = "Trường này không được để trống.";
                 return false;
             }

@@ -13,8 +13,8 @@
         </region>
         <td>{notag(items.apartmentTitle ?? '')}</td>
         <td>{notag(items.title ?? '')}</td>
-        <td>{notag(items.startTime ?? '')}</td>
-        <td>{notag(items.endTime ?? '')}</td>
+        <td>{notag(CDateTime(items.startTime ?? '')->date())}</td>
+        <td>{notag(CDateTime(items.endTime ?? '')->date())}</td>
         <td>
             <a class="action" href="javascript:void(0);"
                title="{'Chi tiết'}"

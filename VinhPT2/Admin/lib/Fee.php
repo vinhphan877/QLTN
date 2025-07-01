@@ -54,15 +54,48 @@ class Fee extends CRUD {
         }
     }
 
-    protected static function getTotalUnPaidFee(array &$item): void {
-        $fees = Data('Newbie.VinhptFee')->select(['_id' => Data::objectId($item['feeId'])]);
-        $fees = $fees['fees'] ?? [];
-        $total = 0;
-        foreach ($fees as $fee) {
-            $total += $fee['ammount'] ?? 0;
-        }
-        $item['totalUnPaidFee'] = $total;
-    }
+    #[\Service]
+    public static function getTotalUnpaidFee(): array {
+        $fees = Data('Newbie.VinhptFee')->select([
+            'filter' => [
+                'status' => FeeStatus::NOTAVAIABLE->value
+            ],
+            'fields' => ['_id', 'householdId', 'amount']
+        ]);
 
+        $report = [];
+        $totalAmount = 0;
+
+        foreach ($fees as $fee) {
+            $householdId = $fee['householdId'] ?? '';
+            $amount = (float)($fee['amount'] ?? 0);
+
+            if (!$householdId || $amount <= 0) {
+                continue;
+            }
+
+            if (!isset($report[$householdId])) {
+                $report[$householdId] = [
+                    'householdId' => $householdId,
+                    'totalUnpaid' => 0,
+                    'numUnpaidFees' => 0,
+                ];
+            }
+
+            $report[$householdId]['totalUnpaid'] += $amount;
+            $report[$householdId]['numUnpaidFees']++;
+            $totalAmount += $amount;
+        }
+
+        $reportItems = array_values($report);
+        Data::getMoreFields('Newbie.VinhptHousehold', $reportItems, [
+            'householdId' => ['title' => 'householdTitle']
+        ]);
+
+        return [
+            'byHousehold' => $reportItems,
+            'totalUnpaidAll' => $totalAmount
+        ];
+    }
 
 }

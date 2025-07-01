@@ -1,4 +1,6 @@
-<pre>{print_r($params)}</pre>
+<pre>
+    {print_r($params)}
+</pre>
 <CMS.detail hideAddNew="1" hideReload="1" hideActions="1" hideCheckbox="1">
     <div class="panel panel-default">
         <div class="panel-heading">
@@ -21,7 +23,7 @@
                     <td>{items._index + 1}</td>
                     <td>{notag(items.name ?? '')}</td>
                     <td>{number(items.age ?? '')}</td>
-                    <td>{number(items.genderTitle ?? '')}</td>
+                    <td>{number(items.gender ?? '')}</td>
                 </tr>
                 <!--/LIST-->
                 <!--ELSE-->

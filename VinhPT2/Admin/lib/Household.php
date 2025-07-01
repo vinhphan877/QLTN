@@ -64,69 +64,90 @@ class Household extends CRUD {
         ]);
     }
 
-    /**
-     * Lấy thông tin cư dân trong hộ gia đình
-     * @author vinhpt
-     * @param array $household
-     * @return array
-     */
     #[\Service]
-    public function getHouseholdMembers(array $household): array {
-        $members = [];
-
-        if (!empty($household['members']) && is_array($household['members'])) {
-            foreach ($household['members'] as $member) {
-                $genderText = Gender::getTitle($member['gender'] ?? '') ?? '';
-
-                $members[] = [
-                    'name' => $member['name'] ?? '',
-                    'age' => $member['age'] ?? '',
-                    'gender' => $genderText
-                ];
-            }
-        }
-        return $members;
+    public function getHouseholdMembers(): array {
+        return Data('Newbie.VinhptHousehold')->select([
+            'site' => portal()->id,
+            '_id' => Data::objectId($fields['householdId'] ?? ''),
+        ]);
     }
 
-    /**
-     * Lấy danh sách cư dân theo độ tuổi
-     * @author vinhpt
-     * @return array|array[]
-     */
-    public static function getResidentReportByAge($flield, $item): array {}
-
-    /**
-     * Lấy danh sách cư dân theo giới tính
-     * @author vinhpt
-     * @return array
-     */
-
-    public static function getResidentReportByGender(): array {
-        $pipeline = [
-            ['$unwind' => '$members'],
-            ['$replaceRoot' => ['newRoot' => '$members']],
-            [
-                '$facet' => [
-                    'group_male' => [
-                        ['$match' => ['gender' => Gender::MALE->value]],
-                        ['$sort' => ['age' => 1]]
-                    ],
-                    'group_female' => [
-                        ['$match' => ['gender' => Gender::FEMALE->value]],
-                        ['$sort' => ['age' => 1]]
-                    ],
-                    'group_other' => [
-                        ['$match' => ['gender' => Gender::OTHER->value]],
-                        ['$sort' => ['age' => 1]]
-                    ]
-                ]
+    #[\Service]
+    public static function getResidentReportByAge(): array {
+        $citizens = Data('Newbie.VinhptHousehold')->select([
+            'fields' => [
+                'site' => portal()->id,
+                '_id' => Data::objectId($fields['householdId'] ?? ''),
+                'age' => $fields['age'] ?? '',
             ]
+        ]);
+
+        $ageGroups = [
+            '0-6' => 0,
+            '6-12' => 0,
+            '12-18' => 0,
+            '18-24' => 0,
+            '24-60' => 0,
+            '60+' => 0
         ];
-        $aggregationResult = Data(static::$type)->aggregate($pipeline);
-        $result = $aggregationResult[0] ?? [];
-        return [
-            'Nam' => $result['group_male'] ?? [],
+
+        foreach ($citizens as $citizen) {
+            $age = $citizen['age'] ?? '';
+
+            if (!is_numeric($age)) {
+                continue;
+            }
+
+            if ($age >= 0 && $age < 6) {
+                $ageGroups['0-6']++;
+            } elseif ($age < 12) {
+                $ageGroups['6-12']++;
+            } elseif ($age < 18) {
+                $ageGroups['12-18']++;
+            } elseif ($age < 24) {
+                $ageGroups['18-24']++;
+            } elseif ($age < 60) {
+                $ageGroups['24-60']++;
+            } else {
+                $ageGroups['60+']++;
+            }
+        }
+
+        return $ageGroups;
+    }
+
+    #[\Service]
+    public static function getResidentReportByGender(): array {
+        $citizens = Data('Newbie.VinhptHousehold')->select([
+            'fields' => [
+                'site' => portal()->id,
+                '_id' => Data::objectId($fields['householdId'] ?? ''),
+                'name' => $fields['name'] ?? '',
+                'gender' => $fields['gender'] ?? '',
+            ]
+        ]);
+
+        $result = [
+            'male' => [],
+            'female' => [],
+            'other' => []
         ];
+
+        foreach ($citizens as $citizen) {
+            switch ($citizen['gender'] ?? '') {
+                case Gender::MALE->value:
+                    $result['male'][] = $citizen;
+                    break;
+                case Gender::FEMALE->value:
+                    $result['female'][] = $citizen;
+                    break;
+                default:
+                    $result['other'][] = $citizen;
+                    break;
+            }
+        }
+
+        return $result;
     }
 
 }
