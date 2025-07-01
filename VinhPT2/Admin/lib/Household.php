@@ -62,13 +62,13 @@ class Household extends CRUD {
         Data::getMoreFields('Newbie.VinhptApartment', $items, [
             'apartmentId' => ['title' => 'apartmentTitle']
         ]);
-    }
 
-    #[\Service]
-    public function getHouseholdMembers(): array {
-        return Data('Newbie.VinhptHousehold')->select([
-            'site' => portal()->id,
-            '_id' => Data::objectId($fields['householdId'] ?? ''),
+        Data::getMoreFields('Newbie.VinhptHousehold', $items, [
+            'householdId' => [
+                'name' => 'name',
+                'age' => 'age',
+                'gender' => 'gender'
+            ]
         ]);
     }
 

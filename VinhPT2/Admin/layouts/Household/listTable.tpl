@@ -21,10 +21,10 @@
                data-modal-class="modal-fullscreen"
                data-x-modal="{(changeTail(layout, 'detail'))}"
                data-popup="1"
-               data-filters-household-id="{items.householdId ?? ''}"
                data-x-popup="backdrop:'static',keyboard: false"
-               data-service="Samples.Newbie.VinhPT2.Admin.Household.selectAll"
-               data-household-id="{items.householdId ?? ''}"
+               data-service="Samples.Newbie.VinhPT2.Admin.Household.select"
+               data-item-id="{items.id ?? ''}"
+               data-id="{items.id ?? ''}"
                data-grid-module-parent-id="_MID_">
                 <i class="vi vi-eye vi-1_2x"></i>
             </a>
