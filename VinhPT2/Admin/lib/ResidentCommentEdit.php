@@ -24,6 +24,7 @@ class ResidentCommentEdit {
     public static function checkRequired(array $fields, array &$return): bool {
         $requiredFields = [
             'title',
+            'content',
             'householdId'
         ];
         $valid = true;
@@ -55,6 +56,7 @@ class ResidentCommentEdit {
             $filters = [
                 'site' => portal()->id,
                 'title' => $fields['title'],
+                'content' => $fields['content'],
                 'householdId' => $fields['householdId']
             ];
             if (!empty($oldItem)) {

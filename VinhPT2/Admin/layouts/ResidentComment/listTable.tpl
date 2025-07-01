@@ -1,7 +1,4 @@
-<pre>
-    {print_r($params)}
-</pre>
-<CMS.Admin.list hideAddNew="1" hideReload="1" hideActions="1" hideCheckbox="1">
+<CMS.Admin.list>
     <!--IF(!empty(items))-->
     <CMS.Admin.table>
         <region name="header">
@@ -10,8 +7,8 @@
             <th>Nội dung</th>
             <th>Trạng thái</th>
         </region>
+        <td>{notag(items.householdTitle ?? '')}</td>
         <td>{notag(items.title ?? '')}</td>
-        <td>{notag(items.content ?? '')}</td>
         <td>{notag(items.content ?? '')}</td>
         <td>{notag(items.status ?? '')}</td>
     </CMS.Admin.table>

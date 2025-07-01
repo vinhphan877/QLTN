@@ -10,6 +10,7 @@ namespace Samples\Newbie\VinhPT2\Admin\lib;
 
 use Data;
 use Data\lib\CRUD;
+use Samples\Newbie\VinhPT2\Enum\lib\FeedBackStatus;
 
 class ResidentComment extends CRUD {
     public static string $type = 'Newbie.VinhptResidentComment';
@@ -31,8 +32,14 @@ class ResidentComment extends CRUD {
     protected function prepareList(array &$return): void {
         if (!empty($return['items'])) {
             static::addFields($return['items']);
+            FeedBackStatus::addTitle($return['items'], 'status');
         }
         parent::prepareList($return);
+    }
+
+    protected function checkItem(array &$item): bool {
+        $item['statusTitle'] = FeedBackStatus::getTitle($item['status'] ?? '');
+        return parent::checkItem($item);
     }
 
     protected static function getUnProcessedCommentsList(array &$items): void {
@@ -49,7 +56,7 @@ class ResidentComment extends CRUD {
 
     public static function addFields(array &$items): void {
         Data::getMoreFields('Newbie.VinhptHousehold', $items, [
-            'householdId' => ['title' => 'householdName']
+            'householdId' => ['title' => 'householdTitle']
         ]);
     }
 }
