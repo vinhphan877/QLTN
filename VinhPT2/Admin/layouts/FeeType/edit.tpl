@@ -7,10 +7,7 @@
         <input name="fields[price]" type="Form.Number" value="{price ?? ''}"
                class="form-control">
     </Layout.label>
-    <Layout.label label="Hạn nộp" required=1>
-        <input name="fields[deadline]" type="Form.DateRangePicker" value="{(deadline??'')}"
-               class="form-control" description="Chọn khoảng thời gian">
-    </Layout.label>
+    <Layout.label label="Lưu ý: Hạn nộp mặc định sẽ từ ngày 1-10 hằng tháng" required="1"></Layout.label>
 </CMS.edit>
 <script type="text/javascript">
     VHV.using({
@@ -23,10 +20,6 @@
                 required: true,
                 number: true,
                 min: 0
-            },
-            'fields[deadline]': {
-                required: true,
-                dateRangeVN: true
             }
         }
     });

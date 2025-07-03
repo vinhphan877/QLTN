@@ -1,7 +1,4 @@
-<pre>
-    {print_r($params)}
-</pre>
-<CMS.detail hideAddNew="1" hideReload="1" hideActions="1" hideCheckbox="1">
+<CMS.detail hideAddNew="1" hideReload="1" hideActions="1" hideCheckbox="1" hideHeader="1">
     <div class="panel panel-default">
         <div class="panel-heading">
             <h3 class="panel-title">Danh sách thành viên trong căn hộ</h3>
@@ -17,18 +14,18 @@
                 </tr>
                 </thead>
                 <tbody>
-                <!--IF(!empty(items))-->
-                <!--LIST(items)-->
+                <!--IF(!empty(members))-->
+                <!--LIST(members)-->
                 <tr>
-                    <td>{items._index + 1}</td>
-                    <td>{notag(items.name ?? '')}</td>
-                    <td>{number(items.age ?? '')}</td>
-                    <td>{number(items.gender ?? '')}</td>
+                    <td>{members._index}</td>
+                    <td>{notag(members.name ?? '')}</td>
+                    <td>{number(members.age ?? '')}</td>
+                    <td>{notag(members.genderTitle ?? '')}</td>
                 </tr>
                 <!--/LIST-->
                 <!--ELSE-->
                 <tr>
-                    <td colspan="8" class="text-center">Không có dữ liệu</td>
+                    <td colspan="4" class="text-center">Không có dữ liệu</td>
                 </tr>
                 <!--/IF-->
                 </tbody>

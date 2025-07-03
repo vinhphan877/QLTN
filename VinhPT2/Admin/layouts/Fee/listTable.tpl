@@ -5,10 +5,12 @@
         <th>Tên phí</th>
         <th>Số tiền</th>
         <th>Thời gian nộp</th>
+        <th>Trạng thái</th>
     </region>
-    <td>{!empty(items.buildingTitle) ? items.buildingTitle : ''}</td>
+    <td>{!empty(items.householdTitle) ? items.householdTitle : ''}</td>
     <td>{!empty(items.feeTypeTitle) ? items.feeTypeTitle : ''}</td>
     <td>{notag(items.title ?? '')}</td>
     <td>{notag(items.amount ?? '')}</td>
-    <td>{notag(items.submissionTime ?? '')}</td>
+    <td>{notag(CDateTime(items.submissionTime ?? '')->date())}</td>
+    <td>{!empty(items.statusTitle) ? items.statusTitle : ''}</td>
 </CMS.Admin.table>

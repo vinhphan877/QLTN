@@ -1,4 +1,4 @@
-<CMS.Admin.list sortTime="1" modalClass="modal-md" typeTitle="{'Quản lý các khoản phí'}">
+<CMS.Admin.list sortTime="1" modalClass="modal-md" typeTitle="{'Quản lý các loại phí'}">
     <region name="menuTab">
         <Samples.Newbie.VinhPT2.Admin.tab></Samples.Newbie.VinhPT2.Admin.tab>
     </region>

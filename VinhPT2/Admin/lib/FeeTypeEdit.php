@@ -16,7 +16,7 @@ class FeeTypeEdit {
      * @return bool
      */
     public static function checkRequired(array $fields, array &$return): bool {
-        $requiredFields = ['title', 'price', 'deadline'];
+        $requiredFields = ['title', 'price'];
         foreach ($requiredFields as $field) {
             if (!isset($fields[$field]) || $fields[$field] === '') {
                 $return['message'] = "Thiếu trường bắt buộc: $field";
@@ -27,52 +27,15 @@ class FeeTypeEdit {
         return true;
     }
 
+    /**
+     * Đặt trạng thái mặc định khi tạo mới loại phí
+     * @author vinhpt
+     * @param array $fields
+     */
     public static function setDefaultStatus(array &$fields): void {
         if (empty($fields['status'])) {
             $fields['status'] = 0;
         }
-    }
-
-    /**
-     * Kiểm tra độ dài tối đa của tên loại phí.
-     * @author vinhpt
-     * @param array $fields
-     * @param array $return
-     * @return bool
-     */
-    public static function checkTitleLength(array $fields, array &$return): bool {
-        if (!empty($fields['title']) && mb_strlen($fields['title']) > 225) {
-            $return['message'] = 'Tên loại phí không được vượt quá 225 ký tự.';
-            $return['errors']['fields[title]'] = 'Độ dài tối đa là 225 ký tự.';
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     *Y svhrdee
-     * Kiểm tra tính hợp lệ của hạn nộp.
-     * @author vinhpt
-     * @param array $fields
-     * @param array $return
-     * @return bool
-     */
-    public static function checkDeadline(array $fields, array &$return): bool {
-        $start = (int)($fields['deadlineStartDay'] ?? 0);
-        $end = (int)($fields['deadlineEndDay'] ?? 0);
-
-        if ($start < 1 || $start > 31 || $end < 1 || $end > 31) {
-            $return['message'] = 'Ngày hạn nộp phải là một ngày hợp lệ trong tháng (từ 1 đến 31).';
-            $return['errors']['fields[deadlineStartDay]'] = 'Ngày không hợp lệ.';
-            return false;
-        }
-
-        if ($start > $end) {
-            $return['message'] = 'Ngày bắt đầu hạn nộp phải trước hoặc bằng ngày kết thúc.';
-            $return['errors']['fields[deadlineEndDay]'] = 'Ngày kết thúc phải sau ngày bắt đầu.';
-            return false;
-        }
-        return true;
     }
 
     /**

@@ -8,11 +8,13 @@ use L;
 enum FeeStatus: int {
     use Enum;
 
-    #[L('Đã trả')]
-    case AVAIABLE = 0;
-    #[L('Chưa trả')]
-    case NOTAVAIABLE = 1;
-    #[L('Quá hạn')]
-    case EXPIRED = 2;
+    #[L('Đã đóng đúng hạn')]
+    case PAIDONTIME = 0;
+    #[L('Không đóng đúng hạn')]
+    case EXPIRED = 1;
+    #[L('Chưa đóng')]
+    case NOTPAID = 2;
+    #[L('Cần đóng')]
+    case NEEDPAID = 3;
 
 }

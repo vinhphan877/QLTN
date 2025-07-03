@@ -54,27 +54,34 @@ class Household extends CRUD {
     protected function prepareList(array &$return): void {
         if (!empty($return['items'])) {
             static::addFields($return['items']);
+            Gender::addTitle($return['items'], 'gender');
         }
+
         parent::prepareList($return);
     }
 
     protected static function addFields(array &$items): void {
         Data::getMoreFields('Newbie.VinhptApartment', $items, [
-            'apartmentId' => ['title' => 'apartmentTitle']
-        ]);
-
-        Data::getMoreFields('Newbie.VinhptHousehold', $items, [
-            'householdId' => [
-                'name' => 'name',
-                'age' => 'age',
-                'gender' => 'gender'
+                'apartmentId' => ['title' => 'apartmentTitle']
             ]
-        ]);
+        );
+    }
+
+    protected function checkItem(array &$item): bool {
+        if (!empty($item['members']) && is_array($item['members'])) {
+            foreach ($item['members'] as &$member) {
+                if (isset($member['gender'])) {
+                    $member['genderTitle'] = Gender::getTitle((string)$member['gender']);
+                }
+            }
+        }
+
+        return parent::checkItem($item);
     }
 
     #[\Service]
     public static function getResidentReportByAge(): array {
-        $citizens = Data('Newbie.VinhptHousehold')->select([
+        $residents = Data('Newbie.VinhptHousehold')->select([
             'fields' => [
                 'site' => portal()->id,
                 '_id' => Data::objectId($fields['householdId'] ?? ''),
@@ -91,8 +98,8 @@ class Household extends CRUD {
             '60+' => 0
         ];
 
-        foreach ($citizens as $citizen) {
-            $age = $citizen['age'] ?? '';
+        foreach ($residents as $resident) {
+            $age = $resident['age'] ?? '';
 
             if (!is_numeric($age)) {
                 continue;
@@ -118,7 +125,7 @@ class Household extends CRUD {
 
     #[\Service]
     public static function getResidentReportByGender(): array {
-        $citizens = Data('Newbie.VinhptHousehold')->select([
+        $residents = Data('Newbie.VinhptHousehold')->select([
             'fields' => [
                 'site' => portal()->id,
                 '_id' => Data::objectId($fields['householdId'] ?? ''),
@@ -133,21 +140,86 @@ class Household extends CRUD {
             'other' => []
         ];
 
-        foreach ($citizens as $citizen) {
-            switch ($citizen['gender'] ?? '') {
+        foreach ($residents as $resident) {
+            switch ($resident['gender'] ?? '') {
                 case Gender::MALE->value:
-                    $result['male'][] = $citizen;
+                    $result['male'][] = $resident;
                     break;
                 case Gender::FEMALE->value:
-                    $result['female'][] = $citizen;
+                    $result['female'][] = $resident;
                     break;
                 default:
-                    $result['other'][] = $citizen;
+                    $result['other'][] = $resident;
                     break;
             }
         }
 
         return $result;
     }
-
+//Mảng trả về kết quả như sau:Array
+//(
+//    [rules] => Array
+//        (
+//        )
+//
+//    [messages] => Array
+//        (
+//        )
+//
+//    [service] => Samples.Newbie.VinhPT2.Admin.Household.select
+//    [layout] => Samples.Newbie.VinhPT2.Admin.Household.detail
+//    [itemId] => 686498205bce3e3713010b14
+//    [colomboDebug2] => 0
+//    [gridModuleParentId] => 1
+//    [xPopup] => backdrop:'static',keyboard: false
+//    [popup] => 1
+//    [modalClass] => modal-fullscreen
+//    [module] => Content.Form
+//    [region] => center
+//    [position] => 1
+//    [index] => 0
+//    [modulePosition] => 0
+//    [id] => 2001
+//    [path] => Content
+//    [moduleParentId] => -1
+//    [_entityTitle] => bản ghi
+//    [_id] => MongoDB\BSON\ObjectId Object
+//        (
+//            [oid] => 686498205bce3e3713010b14
+//        )
+//
+//    [createdTime] => 1751423008
+//    [lastUpdateTime] => 1751423008
+//    [sortOrder] => 1751423008
+//    [creatorId] => 5912582
+//    [site] => 2005948
+//    [type] => Newbie.VinhptHousehold
+//    [apartmentId] => 685a7d41526ad02f230ff969
+//    [title] => rthrhr
+//    [members] => Array
+//        (
+//            [1] => Array
+//                (
+//                    [name] => etge
+//                    [age] => 32
+//                    [gender] => 2
+//                )
+//
+//        )
+//
+//    [startTime] => 2194621200
+//    [endTime] => 2320246799
+//    [suggestTitle] => rthrhr||rthrhr||rthrhr||rthrhr||Rthrhr
+//    [type1] => Newbie
+//    [type2] => Newbie.VinhptHousehold
+//    [genderTitle] =>
+//    [rootURL] => https://newbie.coquan.vn/
+//    [staticURL] => /
+//    [currency] => VND
+//    [mid] => 2001
+//)
+//1
+// Vấn đề đặt ra là genderTitle sẽ chỉ trar về cho 1 members và không truy xuất được do không nằm trong members
+// Và nếu có nhiều members thì sẽ không xử lý được.
+//Sửa lôỗi này
 }

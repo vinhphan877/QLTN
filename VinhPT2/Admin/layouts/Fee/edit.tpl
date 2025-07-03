@@ -6,9 +6,9 @@
                value="{quote(!empty(householdId) ? householdId : '')}"
                description="-- {'Chọn %s', 'hộ gia đình'} --">
     </Layout.label>
-    <Layout.label label="Mã loại phí" required="1">
+    <Layout.label label="Loại phí" required="1">
         <input class="form-control" type="Form.Select"
-               name="fields[feeTypeId]" service="Samples.Newbie.VinhPT2.Admin.Fee.selectList"
+               name="fields[feeTypeId]" service="Samples.Newbie.VinhPT2.Admin.FeeType.selectList"
                options[orderBy]="sortOrder ASC"
                value="{quote(!empty(feeTypeId) ? feeTypeId : '')}"
                description="-- {'Chọn %s', 'loại phí'} --">
@@ -17,7 +17,7 @@
         <input name="fields[title]" type="Form.Text" value="{title ?? ''}"
                placeholder="{'Tên phí'}" class="form-control money">
     </Layout.label>
-    <Layout.label label="Số tiền" required="1">
+    <Layout.label label="Số tiền nộp" required="1">
         <input name="fields[amount]" type="Form.Text" value="{amount ?? ''}"
                placeholder="{'Số tiền'}" class="form-control money">
     </Layout.label>

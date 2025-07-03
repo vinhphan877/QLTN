@@ -18,18 +18,20 @@ class Fee extends CRUD {
     public static array $options = [
         'itemsPerPage' => 20,
         'pageNo' => 1,
+        'fields' => '*',
         'orderBy' => 'createdTime DESC'
     ];
 
     protected function prepareEdit(array &$fields, array &$oldItem, array &$return): bool {
-        if (!FeeEdit::checkRequired($fields, $return)) {
+        if (!FeeEdit::checkRequired($fields, $return) || !FeeEdit::validateStatusOnCreate($fields, $return)) {
             return false;
         }
 
-        $household = Data('Newbie.VinhptHousehold')->select(['_id' => Data::objectId($fields['householdId'])]);
+        Data('Newbie.VinhptHousehold')->select([
+            '_id' => Data::objectId($fields['householdId'])
+        ]);
 
-        return FeeEdit::checkTime($fields, $household, $return)
-            && parent::prepareEdit($fields, $oldItem, $return);
+        return parent::prepareEdit($fields, $oldItem, $return);
     }
 
     protected function checkDelete(array &$item, array &$return): bool {
@@ -41,8 +43,8 @@ class Fee extends CRUD {
         Data::getMoreFields('Newbie.VinhptHousehold', $items, [
             'householdId' => ['title' => 'householdTitle'],
         ]);
-        Data::getMoreFields('Newbie.VinhptFeeTypes', $items, [
-            'feeTypesId' => ['title' => 'feeTypeTitle'],
+        Data::getMoreFields('Newbie.VinhptFeeType', $items, [
+            'feeTypeId' => ['title' => 'feeTypeTitle'],
         ]);
     }
 
@@ -57,9 +59,7 @@ class Fee extends CRUD {
     #[\Service]
     public static function getTotalUnpaidFee(): array {
         $fees = Data('Newbie.VinhptFee')->select([
-            'filter' => [
-                'status' => FeeStatus::NOTAVAIABLE->value
-            ],
+            'filter' => ['status' => FeeStatus::NOTPAID->value],
             'fields' => ['_id', 'householdId', 'amount']
         ]);
 

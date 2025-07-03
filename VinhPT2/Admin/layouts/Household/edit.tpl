@@ -79,6 +79,7 @@
                     gt: 'fields[startTime]'
                 }
             }
-        }
+        },
+        members: php(`!empty(members) ? members : []`)
     });
 </script>

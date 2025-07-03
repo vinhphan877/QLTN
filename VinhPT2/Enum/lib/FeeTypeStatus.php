@@ -9,7 +9,7 @@ enum FeeTypeStatus: int {
     use Enum;
 
     #[L('Còn hiệu lực')]
-    case AVAIABLE = 0;
+    case AVAILABLE = 0;
     #[L('Không còn hiệu lực')]
     case NOTAVAIABLE = 1;
 }

@@ -8,6 +8,7 @@
 
 namespace Samples\Newbie\VinhPT2\Admin\lib;
 
+use Data;
 use Samples\Newbie\VinhPT2\Enum\lib\FeeStatus;
 
 class FeeEdit {
@@ -19,7 +20,7 @@ class FeeEdit {
      * @return bool
      */
     public static function checkRequired(array $fields, array &$return): bool {
-        $required = ['title', 'amount', 'submissionTime', 'status', 'householdId', 'feeTypesId'];
+        $required = ['title', 'amount', 'submissionTime', 'householdId', 'feeTypeId'];
         foreach ($required as $field) {
             if (!isset($fields[$field]) || $fields[$field] === '') {
                 $return['message'] = "Trường '$field' là bắt buộc.";
@@ -34,12 +35,6 @@ class FeeEdit {
             return false;
         }
 
-        if (FeeStatus::getTitle($fields['status']) === '') {
-            $return['message'] = 'Giá trị trạng thái không hợp lệ.';
-            $return['errors']['fields[status]'] = 'Trạng thái không hợp lệ.';
-            return false;
-        }
-
         return true;
     }
 
@@ -51,7 +46,7 @@ class FeeEdit {
      * @return bool
      */
     public static function validateStatusOnDelete(array $item, array &$return): bool {
-        if (isset($item['status']) && $item['status'] != FeeStatus::AVAIABLE->value) {
+        if (isset($item['status']) && $item['status'] != FeeStatus::PAIDONTIME->value) {
             $return['message'] = 'Chỉ có thể xóa khoản phí đã ở trạng thái "Đã trả".';
             return false;
         }
@@ -59,24 +54,63 @@ class FeeEdit {
     }
 
     /**
-     * Kiểm tra thời gian nộp phí phải nằm trong thời gian thuê của hộ gia đình.
+     * Kiểm tra số tiền nộp phải > 0 và < soos tieenf quy định
      * @author vinhpt
      * @param array $fields
-     * @param array $household
      * @param array $return
      * @return bool
      */
-    public static function checkTime(array $fields, array $household, array &$return): bool {
-        if (empty($household)) {
-            $return['message'] = 'Hộ gia đình không tồn tại.';
-            return false;
-        }
-        if ($fields['submissionTime'] < $household['startTime'] || $fields['submissionTime'] > $household['endTime']) {
-            $return['message'] = 'Thời gian nộp phí phải nằm trong thời gian thuê của hộ gia đình.';
-            $return['errors']['fields[submissionTime]'] = 'Thời gian nộp không hợp lệ.';
-            return false;
+    public static function checkAmmount(array $fields, array &$return): bool {
+        if (!empty($fields['amount']) && $fields['amount'] > 0 && !empty($fields['feeTypeId'])) {
+            $feeType = Data('Newbie.VinhptDeeType')->select([
+                'site' => portal()->id,
+                'id' => $fields['feeTypeId']
+            ]);
+
+            if (!$feeType || !isset($feeType['price'])) {
+                $return['message'] = 'Không tìm thấy thông tin loại phí hoặc giá không hợp lệ.';
+                $return['errors']['fields[feeTypeId]'] = 'Loại phí không hợp lệ.';
+                return false;
+            }
+
+            $price = $feeType['price'];
+
+            if ($fields['amount'] >= $price) {
+                $return['message'] = 'Số tiền nộp phải nhỏ hơn mức phí quy định.';
+                $return['errors']['fields[amount]'] = 'Số tiền không được lớn hơn hoặc bằng giá quy định.';
+                return false;
+            }
         }
         return true;
     }
 
+    /**
+     * Đặt trạng thái khi tạo mới.
+     * Nếu submissionTime trong khoảng ngày 1 đến ngaỳ 10 hằng tháng thì trạng thái sẽ là trả đúng hạn
+     * Nếu submissionTime ngoài khoảng ngày 1 đến ngaỳ 10 hằng tháng thì trạng thái sẽ là trả không đúng hạn
+     * @author vinhpt
+     * @param array $fields
+     * @param array $return
+     * @return bool
+     */
+
+    public static function validateStatusOnCreate(array &$fields, array &$return): bool {
+        $feeType = Data('Newbie.VinhptFeeType')->select($fields['feeTypeId']);
+
+        if (!$feeType || !isset($feeType['price'])) {
+            $return['message'] = 'Không tìm thấy loại phí hoặc thiếu giá.';
+            $return['errors']['fields[feeTypeId]'] = 'Loại phí không hợp lệ.';
+            return false;
+        }
+
+        $timestamp = strtotime($fields['submissionTime']);
+
+        $day = (int)date('d', $timestamp);
+        $fields['status'] = ($day >= 1 && $day <= 10)
+            ? FeeStatus::PAIDONTIME->value
+            : FeeStatus::EXPIRED->value;
+
+        return true;
+    }
+    //
 }

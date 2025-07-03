@@ -22,10 +22,8 @@ class FeeType extends CRUD {
     ];
 
     protected function prepareEdit(array &$fields, array &$oldItem, array &$return): bool {
-        return FeeTypeEdit::setDefaultStatus($fields)
-            && FeeTypeEdit::checkRequired($fields, $return)
-            && FeeTypeEdit::checkTitleLength($fields, $return)
-            && FeeTypeEdit::checkDeadline($fields, $return)
+        FeeTypeEdit::setDefaultStatus($fields);
+        return FeeTypeEdit::checkRequired($fields, $return)
             && FeeTypeEdit::checkExists($fields, $return, $oldItem)
             && parent::prepareEdit($fields, $oldItem, $return);
     }
