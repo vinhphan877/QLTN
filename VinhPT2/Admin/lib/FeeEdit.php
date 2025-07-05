@@ -9,9 +9,45 @@
 namespace Samples\Newbie\VinhPT2\Admin\lib;
 
 use Data;
+use MongoDB\BSON\ObjectId;
 use Samples\Newbie\VinhPT2\Enum\lib\FeeStatus;
 
 class FeeEdit {
+    /**
+     * Kiểm tra thời gian nộp tiền (submissionTime) không thể nhỏ hơn thời gian bắt đầu thuê nhà (startTime trong bảng Household)
+     * @author vinhpt
+     * @param array $fields
+     * @param array $return
+     * @return bool
+     */
+    public static function checkTime(array $fields, array &$return): bool {
+        if (empty($fields['submissionTime']) || empty($fields['householdId'])) {
+            return true;
+        }
+
+        $household = Data('Newbie.VinhptHousehold')->select([
+            'site' => portal()->id,
+            '_id' => Data::objectId($fields['householdId'])
+        ]);
+
+        if (!$household || empty($household['startTime'])) {
+            $return['message'] = 'Không tìm thấy thông tin thời gian bắt đầu thuê nhà.';
+            $return['errors']['fields[householdId]'] = 'Dữ liệu hộ dân không hợp lệ.';
+            return false;
+        }
+
+        $submissionTime = CDateTime($fields['submissionTime'])->time;
+        $rentStartTime = CDateTime($household['startTime'])->time;
+
+        if ($submissionTime < $rentStartTime) {
+            $return['message'] = 'Ngày nộp tiền không thể nhỏ hơn ngày bắt đầu thuê nhà.';
+            $return['errors']['fields[submissionTime]'] = 'Ngày không hợp lệ.';
+            return false;
+        }
+
+        return true;
+    }
+
     /**
      * Kiểm tra các trường bắt buộc dựa trên yêu cầu.
      * @author vinhpt
@@ -103,7 +139,7 @@ class FeeEdit {
             return false;
         }
 
-        $timestamp = strtotime($fields['submissionTime']);
+        $timestamp = CDateTime($fields['submissionTime'])->time;
 
         $day = (int)date('d', $timestamp);
         $fields['status'] = ($day >= 1 && $day <= 10)
@@ -112,5 +148,5 @@ class FeeEdit {
 
         return true;
     }
-    //
+
 }

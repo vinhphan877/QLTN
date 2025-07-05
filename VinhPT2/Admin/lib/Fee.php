@@ -23,7 +23,9 @@ class Fee extends CRUD {
     ];
 
     protected function prepareEdit(array &$fields, array &$oldItem, array &$return): bool {
-        if (!FeeEdit::checkRequired($fields, $return) || !FeeEdit::validateStatusOnCreate($fields, $return)) {
+        if (!FeeEdit::checkRequired($fields, $return)
+            || !FeeEdit::validateStatusOnCreate($fields, $return)
+            || !FeeEdit::checkTime($fields, $return)) {
             return false;
         }
 
@@ -54,48 +56,7 @@ class Fee extends CRUD {
             FeeStatus::addTitle($return['items'], 'status');
             $this->addFields($return['items']);
         }
-    }
 
-    #[\Service]
-    public static function getTotalUnpaidFee(): array {
-        $fees = Data('Newbie.VinhptFee')->select([
-            'filter' => ['status' => FeeStatus::NOTPAID->value],
-            'fields' => ['_id', 'householdId', 'amount']
-        ]);
-
-        $report = [];
-        $totalAmount = 0;
-
-        foreach ($fees as $fee) {
-            $householdId = $fee['householdId'] ?? '';
-            $amount = (float)($fee['amount'] ?? 0);
-
-            if (!$householdId || $amount <= 0) {
-                continue;
-            }
-
-            if (!isset($report[$householdId])) {
-                $report[$householdId] = [
-                    'householdId' => $householdId,
-                    'totalUnpaid' => 0,
-                    'numUnpaidFees' => 0,
-                ];
-            }
-
-            $report[$householdId]['totalUnpaid'] += $amount;
-            $report[$householdId]['numUnpaidFees']++;
-            $totalAmount += $amount;
-        }
-
-        $reportItems = array_values($report);
-        Data::getMoreFields('Newbie.VinhptHousehold', $reportItems, [
-            'householdId' => ['title' => 'householdTitle']
-        ]);
-
-        return [
-            'byHousehold' => $reportItems,
-            'totalUnpaidAll' => $totalAmount
-        ];
     }
 
 }

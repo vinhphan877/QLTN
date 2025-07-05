@@ -43,7 +43,6 @@ class HouseholdEdit {
             $return['errors']['fields[startTime]'] = 'Khoảng thời gian này đã có hộ gia đình khác thuê phòng này.';
             return false;
         }
-
         return true;
     }
 

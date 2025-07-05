@@ -29,4 +29,24 @@
         <!--IF(CPage::$pageName === 'Samples.Newbie.VinhPT.Admin.ResidentComment.list')--> active<!--/IF-->">
         <a href="{url('Samples.Newbie.VinhPT2.Admin.ResidentComment.list',['menuId','m'])}">{'Thông tin góp ý của cư dân'}</a>
     </li>
+    <li role="presentation"
+        class="ant-tabs-tab
+        <!--IF(CPage::$pageName === 'Samples.Newbie.VinhPT2.Admin.Report.FeeReport.list')--> active<!--/IF-->">
+        <a href="{url('Samples.Newbie.VinhPT2.Admin.Report.FeeReport.list',['menuId','m'])}">{'Báo cáo thông kê phí theo trạng thái'}</a>
+    </li>
+    <li role="presentation"
+        class="ant-tabs-tab
+        <!--IF(CPage::$pageName === 'Samples.Newbie.VinhPT2.Admin.Report.ResidentAge.list')--> active<!--/IF-->">
+        <a href="{url('Samples.Newbie.VinhPT2.Admin.Report.ResidentAge.list',['menuId','m'])}">{'Báo cáo thống kê cư dân theo độ tuổi'}</a>
+    </li>
+    <li role="presentation"
+        class="ant-tabs-tab
+        <!--IF(CPage::$pageName === 'Samples.Newbie.VinhPT2.Admin.Report.ResidentComment.list')--> active<!--/IF-->">
+        <a href="{url('Samples.Newbie.VinhPT2.Admin.Report.ResidentComment.list',['menuId','m'])}">{'Báo cáo thống kê góp ý cư dân theo trạng thái'}</a>
+    </li>
+    <li role="presentation"
+        class="ant-tabs-tab
+        <!--IF(CPage::$pageName === 'Samples.Newbie.VinhPT2.Admin.Report.ResidentGender.list')--> active<!--/IF-->">
+        <a href="{url('Samples.Newbie.VinhPT2.Admin.Report.ResidentGenderReport.list',['menuId','m'])}">{'Báo cáo thống kê cư dân theo giới tính'}</a>
+    </li>
 </CMS.Admin.tab>

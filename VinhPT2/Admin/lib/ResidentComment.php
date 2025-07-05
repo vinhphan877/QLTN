@@ -42,21 +42,10 @@ class ResidentComment extends CRUD {
         return parent::checkItem($item);
     }
 
-    protected static function getUnProcessedCommentsList(array &$items): void {
-        $items = array_filter($items, function ($item) {
-            return $item['status'] === 0;
-        });
-    }
-
-    protected static function getProcessedCommentsList(array &$items): void {
-        $items = array_filter($items, function ($item) {
-            return $item['status'] === 1;
-        });
-    }
-
     public static function addFields(array &$items): void {
         Data::getMoreFields('Newbie.VinhptHousehold', $items, [
             'householdId' => ['title' => 'householdTitle']
         ]);
     }
+
 }
