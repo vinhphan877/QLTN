@@ -3,9 +3,10 @@
 namespace Samples\Newbie\VinhPT2\Admin\Report;
 
 use Service;
+use Samples\Newbie\VinhPT2\Enum\lib\FeeStatus;
 
-class ResidentCommentReport extends Service {
-    public static string $type = 'Newbie.VinhptResidentComment';
+class Fee extends Service {
+    public static string $type = 'Newbie.VinhptFee';
     public const ROLES = [
         'selectAll' => 'owner',
         'select' => 'owner',
@@ -16,8 +17,9 @@ class ResidentCommentReport extends Service {
         $return = [];
         $filters['site'] = portal()->id;
         if ($data = Data(static::$type)->match($filters)->group('status', [
-            'total' => ['$count' => '$status']
+            'totalAmount' => ['$sum' => '$amount']
         ])->selectAll()) {
+            FeeStatus::addTitle($data, '_id');
             $return['items'] = $data;
         }
         return $return;
